@@ -1,0 +1,7 @@
+{
+    "default": [
+        { "level": 2, "name": "tconstruct:reinforced" },
+        { "level": 3, "name": "tconstruct:looting" },
+        { "level": 3, "name": "tconstruct:fortune" }
+    ]
+}

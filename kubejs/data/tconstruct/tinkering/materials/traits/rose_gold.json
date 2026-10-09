@@ -1,0 +1,13 @@
+{
+    "default": [
+        { "level": 1, "name": "tconstruct:enhanced" },
+        { "level": 2, "name": "tconstruct:fortune" }
+    ],
+    "perStat": {
+        "tconstruct:skull": [
+            { "level": 1, "name": "tconstruct:gold_guard" },
+            { "level": 1, "name": "tconstruct:piglin_brute_disguise" },
+            { "level": 1, "name": "tconstruct:golden" }
+        ]
+    }
+}
