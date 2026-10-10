@@ -49,13 +49,12 @@
     },
     {
       "type": "tconstruct:stat_boost",
-      "each_level": -0.5,
       "operation": "multiply_all",
-      "stat": "tconstruct:attack_speed"
+      "stat": "tconstruct:attack_speed",
+      "flat": -0.5
     },
     {
       "type": "tconstruct:stat_boost",
-      "each_level": -0.728,
       "operation": "multiply_all",
       "stat": "tconstruct:durability",
       "tool": {
@@ -63,11 +62,11 @@
         "items": [
           "tconstruct:cleaver"
         ]
-      }
+      },
+      "flat": -0.728
     },
     {
       "type": "tconstruct:stat_boost",
-      "each_level": -0.389,
       "operation": "multiply_all",
       "stat": "tconstruct:attack_damage",
       "tool": {
@@ -75,7 +74,8 @@
         "items": [
           "tconstruct:cleaver"
         ]
-      }
+      },
+      "flat": -0.389
     }
   ],
   "tooltip_display": "always"
