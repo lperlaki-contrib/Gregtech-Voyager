@@ -114,3 +114,13 @@ EntityEvents.spawned((event) => {
         if (t) e.setItemSlot(slot, t)
     }
 })
+
+// Catch-all: an original tool/armor entering a player's inventory converts there (Apotheosis affix items from its own loot
+// modifier or affix_loot_entries we don't override, e.g. iron armor; trades; anything the loot/spawn hooks missed). Affixes,
+// enchantments and name are kept by toTinkersTool. Written back through the inventory MENU slot (event.slot is a menu index).
+PlayerEvents.inventoryChanged((event) => {
+    let pl = global.TINKERS_PLAN ? global.TINKERS_PLAN[String(event.item.id)] : null
+    if (!pl || (pl.armor && !TL_armorOn)) return
+    let t = global.toTinkersTool(event.item)
+    if (t) event.player.inventoryMenu.getSlot(event.slot).set(t)
+})
