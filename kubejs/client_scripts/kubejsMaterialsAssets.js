@@ -37,6 +37,26 @@ ClientEvents.highPriorityAssets(function (event) {
     })
     event.add("emi:index/stacks/kubejs_02_kmat_hide_kits", { removed: removed })
 
+    // Leather armor converts to leather travelers gear: tconstruct:leather got plating stats (data/tconstruct/.../stats/leather.json),
+    // so its render info (copy of the jar's leather.json) needs the plating stats too.
+    event.add("tconstruct:tinkering/materials/leather", {
+        color: "FFC65C35",
+        fallbacks: ["cloth"],
+        generator: {
+            supported_stats: ["tconstruct:repair_kit", "tconstruct:binding", "tconstruct:bowstring", "tconstruct:cuirass", "tconstruct:armor_cuirass",
+                "tconstruct:maille", "tconstruct:armor_maille", "tconstruct:armor_plating", "tconstruct:plating_helmet", "tconstruct:plating_chestplate",
+                "tconstruct:plating_leggings", "tconstruct:plating_boots"],
+            transformer: {
+                type: "tconstruct:recolor_sprite",
+                color_mapping: {
+                    type: "tconstruct:grey_to_color",
+                    palette: [["FF000000", 0], ["FF21150D", 63], ["FF342115", 102], ["FF472C1B", 120], ["FF553521", 140], ["FF72482E", 178],
+                        ["FF955E3B", 216], ["FFA36E4E", 255]].map((p) => ({ color: p[0], grey: p[1] }))
+                }
+            }
+        }
+    })
+
     // Twilight Forest ironwood armor converts to tconstruct:ironwood, whose stock render info has no plating stats (missing plating textures).
     // Copy of the jar's assets/tconstruct/tinkering/materials/ironwood.json with the plating stats added to supported_stats.
     event.add("tconstruct:tinkering/materials/ironwood", {
