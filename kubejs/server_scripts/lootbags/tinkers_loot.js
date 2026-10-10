@@ -17,6 +17,7 @@ var TL_ToolStack = Java.loadClass("slimeknights.tconstruct.library.tools.nbt.Too
 var TL_IModifiable = Java.loadClass("slimeknights.tconstruct.library.tools.item.IModifiable")
 var TL_ListTag = Java.loadClass("net.minecraft.nbt.ListTag")
 var TL_EnchantmentHelper = Java.loadClass("net.minecraft.world.item.enchantment.EnchantmentHelper")
+var TL_SHINY = Java.loadClass("slimeknights.tconstruct.library.modifiers.ModifierId").tryParse("tconstruct:shiny")
 var TL_MOD_CAP = { "tconstruct:luck": 3 } // Tinkers' own recipes stop luck at 3
 var TL_unmapped = {} // enchantment id -> times seen without a modifier (logged on first sight)
 
@@ -49,6 +50,7 @@ function tlConvertEnchantments(src, t) {
         let lvl = levels[String(id)]
         if (lvl > 0) tool.addModifier(id, lvl)
     })
+    tool.addModifier(TL_SHINY, 1) // the enchantment glint of the original (Tinkers' Shiny modifier, also slotless here)
     tool.rebuildStats()
 }
 
