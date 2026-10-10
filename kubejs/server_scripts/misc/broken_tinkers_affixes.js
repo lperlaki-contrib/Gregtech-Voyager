@@ -48,8 +48,24 @@ function brokenAffixUpdated(stack) {
     return out
 }
 
+// Tinkers' Tool Leveling (tleveling): affixed Tinkers tools start at a tool level by Apotheosis rarity, so they level up
+// slower than a plain tool (exp needed per level doubles, config/tleveling/common.toml). Setting currentToolLevel grants no
+// level-up rewards (those are only given on an actual level-up). Only raises, never lowers.
+var AFFIX_MIN_LEVEL = { common: 1, uncommon: 2, rare: 3, epic: 4, mythic: 5, ancient: 6 }
+function affixLevelUpdated(stack) {
+    var nbt = stack.nbt
+    if (nbt == null || !nbt.contains('tic_materials') || !nbt.contains('affix_data')) return null
+    var min = AFFIX_MIN_LEVEL[String(nbt.getCompound('affix_data').getString('rarity')).replace(/^.*:/, '')]
+    if (!min || (nbt.contains('currentToolLevel') && nbt.getInt('currentToolLevel') >= min)) return null
+    var out = stack.copy()
+    out.nbt.putInt('currentToolLevel', min)
+    return out
+}
+
 PlayerEvents.inventoryChanged((event) => {
     var updated = brokenAffixUpdated(event.item)
+    var leveled = affixLevelUpdated(updated != null ? updated : event.item)
+    if (leveled != null) updated = leveled
     if (updated != null) event.player.inventoryMenu.getSlot(event.slot).set(updated)
 })
 
