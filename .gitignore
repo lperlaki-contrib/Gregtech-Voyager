@@ -73,3 +73,6 @@ config/aether-client.toml
 /chesttracker
 /chesttracker
 /config
+
+# TEST ONLY: command bridge work files (kubejs/server_scripts/tcon/test_bridge.js)
+kubejs/bridge/
