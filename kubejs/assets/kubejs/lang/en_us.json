@@ -285,7 +285,7 @@
     "material.kubejs.aether_hammer_of_kingbdogz.encyclopedia": "Right-click to throw a hammer projectile (2.5 second cooldown, costs 1 durability).",
     "modifier.kubejs.aether_hammer_throw": "Hammer of Kingbdogz",
     "modifier.kubejs.aether_hammer_throw.flavor": "Throwing it is the point.",
-    "modifier.kubejs.aether_hammer_throw.description": "Right-click to throw a hammer projectile (2.5 second cooldown, costs 1 durability).",
+    "modifier.kubejs.aether_hammer_throw.description": "Right-click to throw a hammer projectile (2.5 second cooldown, costs 1 durability). Swings much faster than a normal sledge hammer (+0.85 attack speed).",
     "material.kubejs.tf_giant": "Giant",
     "material.kubejs.tf_giant.flavor": "Made for hands far too large.",
     "material.kubejs.tf_giant.encyclopedia": "Slow swings, +2.5 reach, and 64 times mining speed against giant blocks.",
