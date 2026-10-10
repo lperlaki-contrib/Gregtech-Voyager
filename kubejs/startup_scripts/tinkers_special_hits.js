@@ -57,15 +57,19 @@ function tshIsSword(stack) { // Aether/IaF "swords"
 // EquipmentUtil.isFullStrength. Tinkers' melee (ToolAttackUtil) resets the attack strength ticker BEFORE dealing damage, so
 // during LivingDamageEvent a Tinkers hit always reads ~0: the strength is recorded when the swing starts (AttackEntityEvent
 // fires before Tinkers' onLeftClickEntity) and read from there.
-var TSH_swingStrength = {} // player UUID -> attack strength at the start of the last swing
+// Server side only (the event also fires on the client, where a script error crashes the game), never throws.
+var TSH_swingStrength = new (Java.loadClass("java.util.WeakHashMap"))() // player -> attack strength at the start of the last swing
 ForgeEvents.onEvent("net.minecraftforge.event.entity.player.AttackEntityEvent", function (event) {
-    var p = event.entity
-    TSH_swingStrength[p.getStringUUID()] = p.getAttackStrengthScale(0.5)
+    try {
+        var p = event.entity
+        if (p.level.clientSide) return
+        TSH_swingStrength.put(p, p.getAttackStrengthScale(0.5))
+    } catch (e) {}
 })
 function tshFull(e) {
     if (!e.isPlayer()) return true
-    var s = TSH_swingStrength[e.getStringUUID()]
-    return (s === undefined ? e.getAttackStrengthScale(0.5) : s) > 0.9 // vanilla's "full swing" threshold (crits, sweeps)
+    var s = TSH_swingStrength.get(e)
+    return (s == null ? e.getAttackStrengthScale(0.5) : s) > 0.9 // vanilla's "full swing" threshold (crits, sweeps)
 }
 
 // Shared with server_scripts/tinkers_special/abilities.js (startup globals are readable from server scripts)
