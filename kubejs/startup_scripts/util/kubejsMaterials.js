@@ -7,13 +7,13 @@
 //
 // Table fields: t = Tinkers tier, s = sortOrder, c = craftable, col = main colour RRGGBB, fb = render fallbacks,
 // st = supported-stats profile (kmatStatProfiles), pal = optional hand-picked 7-stop palette (ARGB hex) overriding
-// the generated one, r = [[item or "#tag", needed], ...] material recipes (value is always 1; they only allow repair
+// the generated one, spr = texture the parts are filled with (kubejs/assets/kubejs/textures/<spr>.png), r = [[item or "#tag", needed], ...] material recipes (value is always 1; they only allow repair
 // and repair kits - part-builder access still depends on c = craftable).
 // Names are prefixed kmat/KUBEJS_ to avoid clashes with feat/tinkers-all-tools' global helpers (renderInfo, shade).
 // Rhino: no spread/destructuring, no const in loops.
 
 global.KUBEJS_MATERIALS = {
-    aether_candy_cane: { t: 0, s: 40, c: false, col: "FF6B81", fb: ["metal"], st: "tool5" },
+    aether_candy_cane: { t: 0, s: 40, c: false, col: "FF6B81", fb: ["metal"], st: "tool5", spr: "kubejs:generator/candy_stripes" },
     aether_flaming: { t: 3, s: 41, c: false, col: "FF7A1A", fb: ["metal"], st: "tool5" },
     aether_hammer_of_kingbdogz: { t: 2, s: 46, c: false, col: "8A6A40", fb: ["metal"], st: "tool5" },
     aether_holy: { t: 3, s: 42, c: false, col: "F5E7A1", fb: ["metal"], st: "tool5" },
@@ -103,16 +103,16 @@ function kmatRenderInfo(e) {
     var prof = kmatStatProfiles[e.st]
     for (var j = 0; j < prof.length; j++) stats.push("tconstruct:" + prof[j])
     for (var a = 0; a < kmatArmorStats.length; a++) stats.push("tconstruct:" + kmatArmorStats[a])
+    // spr: fill the parts with a texture instead of recolouring (Tinkers' grey_to_sprite, like its ice material); dark greys
+    // stay shaded by tinting the texture
+    var transformer = e.spr
+        ? { type: "tconstruct:grey_to_sprite", palette: [{ grey: 0, color: "FF000000" }, { grey: 63, path: e.spr, color: "FF6E6E6E" },
+            { grey: 140, path: e.spr, color: "FFB4B4B4" }, { grey: 216, path: e.spr }] }
+        : { type: "tconstruct:recolor_sprite", color_mapping: { type: "tconstruct:grey_to_color", palette: palette } }
     var info = {
         color: "FF" + e.col,
         fallbacks: e.fb,
-        generator: {
-            supported_stats: stats,
-            transformer: {
-                type: "tconstruct:recolor_sprite",
-                color_mapping: { type: "tconstruct:grey_to_color", palette: palette }
-            }
-        }
+        generator: { supported_stats: stats, transformer: transformer }
     }
     // tex: reuse another material's pre-generated sprites where they exist (e.g. kubejs:gold -> tconstruct:gold repair kit)
     if (e.tex) info.texture = e.tex
