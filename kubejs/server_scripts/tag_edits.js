@@ -71,6 +71,7 @@ ServerEvents.tags("item", (event) => {
     // gtknives.forEach(knife =>{
         event.add("farmersdelight:straw_harvesters", event.get("gtceu:tools/crafting_knives").getObjectIds())
         event.add("farmersdelight:tools/knives", event.get("gtceu:tools/crafting_knives").getObjectIds())
+        event.add("forge:tools/knives", event.get("gtceu:tools/crafting_knives").getObjectIds())
     // })
     /**
      * @param {string} tier
