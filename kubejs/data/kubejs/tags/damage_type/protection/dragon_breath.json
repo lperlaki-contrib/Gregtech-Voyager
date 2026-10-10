@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "iceandfire:dragon_fire",
+      "required": false
+    },
+    {
+      "id": "iceandfire:dragon_ice",
+      "required": false
+    },
+    {
+      "id": "iceandfire:dragon_lightning",
+      "required": false
+    }
+  ]
+}
