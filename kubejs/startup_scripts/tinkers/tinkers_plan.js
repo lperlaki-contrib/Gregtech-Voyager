@@ -34,8 +34,8 @@ global.tinkersConfig = () => {
 // ---- one-line switches ------------------------------------------------------------------------------------------
 // Butcher knife target: [tool id, part slots]. feat/tinkers-knives adds kubejs:butcher_knife; switch it here.
 global.TINKERS_BUTCHER_KNIFE = ["kubejs:butcher_knife", "hw"] // small_blade, tool_handle (feat/tinkers-knives)
-// Shovel target: [tool id, part slots]. kubejs:shovel (feat/tinkers-knives) = large_plate, tool_handle, tool_binding. Mattock is no longer a shovel.
-global.TINKERS_SHOVEL = ["kubejs:shovel", "hwh"]
+// Shovel target: [tool id, part slots]. kubejs:shovel (feat/tinkers-knives) = adze_head, tool_handle. Mattock is no longer a shovel.
+global.TINKERS_SHOVEL = ["kubejs:shovel", "hw"]
 // Tools made from kubejs: materials (Aether skyroot/holystone/zanite/gravitite, AE2 certus_quartz/fluix, IaF dragonbone,
 // myrmex chitin), defined on branch feat/tinkers-aether-materials (and followers).
 // Set to false if those are not merged (the tools are then left alone).

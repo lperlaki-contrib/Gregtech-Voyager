@@ -3,8 +3,7 @@
   "parent": "tconstruct:item/base/axe",
   "textures": {
     "head": "kubejs:item/tool/shovel/head_broken",
-    "handle": "kubejs:item/tool/shovel/handle",
-    "binding": "kubejs:item/tool/shovel/binding"
+    "handle": "kubejs:item/tool/shovel/handle"
   },
   "modifier_roots": [
     "tconstruct:item/tool/excavator/modifiers/"
@@ -17,10 +16,6 @@
     {
       "name": "head",
       "index": 0
-    },
-    {
-      "name": "binding",
-      "index": 2
     }
   ]
 }
