@@ -3,7 +3,7 @@
 ["Recipe Integration"]
 	generateMeltingAndCastingRecipes = false
 	generateExtruderRecipes = true
-	generateFluidSolidificationRecipes = false
+	generateFluidSolidificationRecipes = true
 
 #Configuration related to material modification.
 ["Material Modification"]
