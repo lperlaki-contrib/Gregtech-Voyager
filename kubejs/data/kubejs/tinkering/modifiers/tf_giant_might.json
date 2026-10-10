@@ -28,7 +28,10 @@
       ],
       "percent": false,
       "require_effective": false,
-      "blocks": { "type": "mantle:tag", "tag": "kubejs:tf_giant_blocks" }
+      "blocks": {
+        "type": "mantle:tag",
+        "tag": "kubejs:tf_giant_blocks"
+      }
     },
     {
       "type": "tconstruct:conditional_mining_speed",
@@ -39,13 +42,40 @@
       ],
       "percent": false,
       "require_effective": false,
-      "blocks": { "type": "mantle:tag", "tag": "kubejs:tf_giant_obsidian" }
+      "blocks": {
+        "type": "mantle:tag",
+        "tag": "kubejs:tf_giant_obsidian"
+      }
     },
     {
       "type": "tconstruct:stat_boost",
       "each_level": -0.5,
       "operation": "multiply_all",
       "stat": "tconstruct:attack_speed"
+    },
+    {
+      "type": "tconstruct:stat_boost",
+      "each_level": -0.728,
+      "operation": "multiply_all",
+      "stat": "tconstruct:durability",
+      "tool": {
+        "type": "mantle:set",
+        "items": [
+          "tconstruct:cleaver"
+        ]
+      }
+    },
+    {
+      "type": "tconstruct:stat_boost",
+      "each_level": -0.389,
+      "operation": "multiply_all",
+      "stat": "tconstruct:attack_damage",
+      "tool": {
+        "type": "mantle:set",
+        "items": [
+          "tconstruct:cleaver"
+        ]
+      }
     }
   ],
   "tooltip_display": "always"
