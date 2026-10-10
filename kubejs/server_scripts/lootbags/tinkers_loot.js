@@ -5,9 +5,53 @@
 // Hot paths: the loot filter and the spawn handler are O(1) map lookups (no regex over the id list).
 // Rhino: no spread/destructuring.
 
-// returns the Tinkers stack for a tool stack, or null. Keeps count, custom name and Apotheosis affix_data. Enchantments are copied too: Tinkers
-// blocks adding enchantments (anvil/table: isBookEnchantable/canApplyAtEnchantingTable) but keeps unknown NBT, and vanilla
-// enchantment lookups read the stack NBT, so they should still work (untested in-game).
+// returns the Tinkers stack for a tool stack, or null. Keeps count, custom name and Apotheosis affix_data.
+// Enchantments become Tinkers modifiers: Tinkers tools ignore the vanilla Enchantments NBT (they only report enchantments
+// granted by modifiers), so each enchantment is looked up in Tinkers' enchantment -> modifier map (vanilla mapping plus
+// ours, server_scripts/tinkers_special/enchant_modifiers_data.js) and added with ToolStack.addModifier, which uses no
+// slots (slots are only spent by modifier recipes). Level = enchantment level, capped at the enchantment's max level
+// (Apotheosis raises some) and at TL_MOD_CAP; enchantments sharing a modifier (fortune/looting -> luck) take the max.
+// Unmapped enchantments (curses, anvil/table-only ones) stay in the Enchantments NBT, where they are inert.
+var TL_ModifierManager = Java.loadClass("slimeknights.tconstruct.library.modifiers.ModifierManager")
+var TL_ToolStack = Java.loadClass("slimeknights.tconstruct.library.tools.nbt.ToolStack")
+var TL_IModifiable = Java.loadClass("slimeknights.tconstruct.library.tools.item.IModifiable")
+var TL_ListTag = Java.loadClass("net.minecraft.nbt.ListTag")
+var TL_EnchantmentHelper = Java.loadClass("net.minecraft.world.item.enchantment.EnchantmentHelper")
+var TL_MOD_CAP = { "tconstruct:luck": 3 } // Tinkers' own recipes stop luck at 3
+var TL_unmapped = {} // enchantment id -> times seen without a modifier (logged on first sight)
+
+function tlConvertEnchantments(src, t) {
+    let levels = {}
+    let order = []
+    let rest = new TL_ListTag()
+    let it = src.getAllEnchantments().entrySet().iterator()
+    while (it.hasNext()) {
+        let en = it.next()
+        let ench = en.getKey()
+        let lvl = Math.min(en.getValue(), ench.getMaxLevel())
+        let mod = TL_ModifierManager.INSTANCE.get(ench)
+        if (mod == null) {
+            let id = String(TL_EnchantmentHelper.getEnchantmentId(ench))
+            TL_unmapped[id] = (TL_unmapped[id] || 0) + 1
+            if (TL_unmapped[id] == 1) console.info("[tinkers tools] no modifier for enchantment " + id + ", kept as raw NBT")
+            rest.add(TL_EnchantmentHelper.storeEnchantment(TL_EnchantmentHelper.getEnchantmentId(ench), en.getValue()))
+            continue
+        }
+        let mid = String(mod.getId())
+        if (TL_MOD_CAP[mid]) lvl = Math.min(lvl, TL_MOD_CAP[mid])
+        if (!(mid in levels)) order.push(mod.getId())
+        levels[mid] = Math.max(levels[mid] || 0, lvl)
+    }
+    if (rest.size() > 0) t.nbt.put("Enchantments", rest)
+    if (order.length == 0 || !(t.getItem() instanceof TL_IModifiable)) return
+    let tool = TL_ToolStack.from(t)
+    order.forEach((id) => {
+        let lvl = levels[String(id)]
+        if (lvl > 0) tool.addModifier(id, lvl)
+    })
+    tool.rebuildStats()
+}
+
 global.toTinkersTool = (stack) => {
     const t = global.tinkersStackFor(stack.id)
     if (!t) return null
@@ -16,7 +60,6 @@ global.toTinkersTool = (stack) => {
         let src = stack.nbt
         let tag = t.nbt
         if (src && tag) {
-            if (src.contains("Enchantments")) tag.put("Enchantments", src.get("Enchantments"))
             // Apotheosis affixes (loot/mob gear we don't override) keep their data
             if (src.contains("affix_data")) tag.put("affix_data", src.get("affix_data"))
             let disp = src.getCompound("display")
@@ -26,7 +69,10 @@ global.toTinkersTool = (stack) => {
                 tag.put("display", nd)
             }
         }
-    } catch (e) {}
+        if (stack.isEnchanted()) tlConvertEnchantments(stack, t)
+    } catch (e) {
+        console.warn("[tinkers tools] converting " + stack.id + ": " + e)
+    }
     return t
 }
 
