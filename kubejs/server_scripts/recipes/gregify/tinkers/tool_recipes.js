@@ -21,8 +21,8 @@ var TR_ITEM_P = Java.loadClass("java.util.regex.Pattern").compile('"item"\\s*:\\
 // recipe types whose tool inputs are left alone: cooking/melting/recycling the original, Tinkers' own, GT machines (not crafting)
 var TR_ToolStack = Java.loadClass("slimeknights.tconstruct.library.tools.nbt.ToolStack")
 var TR_StringTag = Java.loadClass("net.minecraft.nbt.StringTag")
-// upgrade recipes: [original recipe id, original input tool, original output tool, other ingredients]. All shapeless; AE2's
-// smithing (template + quartz tool + fluix block) becomes shapeless too: smithing copies the base's NBT and can't swap a part.
+// upgrade recipes: [original recipe id, original input tool, original output tool, other ingredients, smithing]. Shapeless, or
+// smithing ([template, addition]): vanilla smithing copies the base's NBT, so tcon/smithing_upgrade.js fixes the result slot.
 var TR_FIERY = "#twilightforest:fiery_vial"
 var TR_UPGRADES = [
     ["twilightforest:equipment/fiery_iron_pickaxe", "minecraft:iron_pickaxe", "twilightforest:fiery_pickaxe", [TR_FIERY, TR_FIERY, TR_FIERY, "#forge:rods/blaze", "#forge:rods/blaze"]],
@@ -33,7 +33,18 @@ var TR_UPGRADES = [
     ["twilightforest:equipment/fiery_fiery_boots", "minecraft:iron_boots", "twilightforest:fiery_boots", [TR_FIERY, TR_FIERY, TR_FIERY, TR_FIERY]],
     ["iceandfire:ghost_sword", "iceandfire:dragonbone_sword", "iceandfire:ghost_sword", ["iceandfire:ghost_ingot"]]
 ]
-;["pickaxe", "axe", "shovel", "hoe", "sword"].forEach((k) => TR_UPGRADES.push(["ae2:tools/fluix_" + k, "ae2:certus_quartz_" + k, "ae2:fluix_" + k, ["ae2:fluix_upgrade_smithing_template", "ae2:fluix_block"]]))
+;["pickaxe", "axe", "shovel", "hoe", "sword"].forEach((k) => TR_UPGRADES.push(["ae2:tools/fluix_" + k, "ae2:certus_quartz_" + k, "ae2:fluix_" + k, ["ae2:fluix_upgrade_smithing_template", "ae2:fluix_block"], true]))
+// the upgraded tool: parts of fromMat switched to the target composition's material in that slot (modifiers, name etc. kept)
+global.tinkersUpgradeStack = (stack, fromMat, toMats) => {
+    let out = stack.copy()
+    let mats = out.nbt.getList("tic_materials", 8) // 8 = string tags
+    for (let i = 0; i < mats.size() && i < toMats.length; i++) {
+        if (String(mats.getString(i)) == fromMat) mats.set(i, TR_StringTag.valueOf(toMats[i]))
+    }
+    TR_ToolStack.from(out).rebuildStats()
+    out.setCount(1)
+    return out
+}
 var TR_SKIP_TYPE = /^(tconstruct:|minecraft:(smelting|blasting|smoking|campfire_cooking)$)|melting|recycl|salvag|repair|^gtceu:(?!.*crafting)/
 ServerEvents.recipes((event) => {
     global.tinkersEnsurePlan() // plan may not be built yet (startup order)
@@ -292,6 +303,7 @@ ServerEvents.recipes((event) => {
     // the original's material, and the result is THAT tool with those parts switched to the upgraded material (modifiers kept).
     // Ingredient like inputFor: a named example + the plain tool, minus broken tools and tools without the material.
     let upgraded = 0
+    global.TINKERS_SMITHING_UPGRADES = {} // "template|tool" -> { from, to } (read by tcon/smithing_upgrade.js)
     TR_UPGRADES.forEach((u) => {
         let from = plan[u[1]]
         let to = plan[u[2]]
@@ -313,20 +325,16 @@ ServerEvents.recipes((event) => {
         let fromMat = from.mat
         let toMats = toParts.mats
         removeIds.push(u[0])
-        event.shapeless(global.tinkersStackFor(u[2]), [ing].concat(u[3]))
-            .id("kubejs:tinkers_upgrade/" + u[0].replace(":", "/"))
-            .modifyResult((grid, result) => {
+        let id = "kubejs:tinkers_upgrade/" + u[0].replace(":", "/")
+        if (u[4]) {
+            event.smithing(global.tinkersStackFor(u[2]), u[3][0], ing, u[3][1]).id(id)
+            global.TINKERS_SMITHING_UPGRADES[u[3][0] + "|" + tool] = { from: fromMat, to: toMats }
+        } else {
+            event.shapeless(global.tinkersStackFor(u[2]), [ing].concat(u[3])).id(id).modifyResult((grid, result) => {
                 let stack = grid.find(ing)
-                if (!stack || stack.isEmpty()) return result
-                let out = stack.copy()
-                let mats = out.nbt.getList("tic_materials", 8) // 8 = string tags
-                for (let i = 0; i < mats.size() && i < toMats.length; i++) {
-                    if (String(mats.getString(i)) == fromMat) mats.set(i, TR_StringTag.valueOf(toMats[i]))
-                }
-                TR_ToolStack.from(out).rebuildStats()
-                out.setCount(1)
-                return out
+                return !stack || stack.isEmpty() ? result : global.tinkersUpgradeStack(stack, fromMat, toMats)
             })
+        }
         upgraded++
     })
     console.info("[tinkers tools] " + upgraded + " upgrade recipes keep the input tool (parts of the old material -> new material)")
