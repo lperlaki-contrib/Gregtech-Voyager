@@ -1,0 +1,33 @@
+{
+  "level_display": "tconstruct:no_levels",
+  "modules": [
+    {
+      "type": "tconstruct:conditional_mining_speed",
+      "formula": ["$durability", "$max_durability", "/", -2.0, "*", 2.5, "+", "$speed", "*"],
+      "percent": true,
+      "require_effective": false,
+      "tool": { "type": "mantle:tag", "tag": "tconstruct:modifiable/harvest/primary" },
+      "variables": {
+        "durability": "tconstruct:tool_durability",
+        "max_durability": { "type": "tconstruct:tool_stat", "stat": "tconstruct:durability" }
+      }
+    },
+    {
+      "type": "tconstruct:conditional_melee_damage",
+      "formula": ["$durability", "$max_durability", "/", -2.0, "*", 1.5, "+", 0.0, "max", 1.0, "+", "$damage", "*"],
+      "percent": true,
+      "tool": {
+        "type": "mantle:or",
+        "predicates": [
+          { "type": "mantle:tag", "tag": "tconstruct:modifiable/melee/sword" },
+          { "type": "mantle:set", "items": ["tconstruct:dagger"] }
+        ]
+      },
+      "variables": {
+        "durability": "tconstruct:tool_durability",
+        "max_durability": { "type": "tconstruct:tool_stat", "stat": "tconstruct:durability" }
+      }
+    }
+  ],
+  "tooltip_display": "always"
+}

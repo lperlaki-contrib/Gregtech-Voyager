@@ -1,0 +1,15 @@
+{
+  "level_display": "tconstruct:no_levels",
+  "modules": [
+    {
+      "type": "tconstruct:conditional_melee_damage",
+      "each_level": 16.0,
+      "percent": false,
+      "target": {
+        "type": "mantle:tag",
+        "tag": "aether:pigs"
+      }
+    }
+  ],
+  "tooltip_display": "always"
+}
