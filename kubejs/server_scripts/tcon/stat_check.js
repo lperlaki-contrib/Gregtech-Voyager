@@ -170,13 +170,23 @@ ServerEvents.customCommand("tinkers_input_check", (event) => {
     if (event.player) event.player.tell(summary)
 })
 
-// /kubejs custom_command tinkers_test_chests: chests in a row east of the player with one of every Tinkers tool/armor made from
-// our materials (kubejs:* and dragonsteel: Aether, Twilight Forest, Ice and Fire, AE2, Nature's Aura abilities and set
-// bonuses), our knives, one tool per enchantment modifier (tinkersEnchantModifiers.js) at its max level, and random loot
-// (enchanted vanilla tools through the loot conversion, Apotheosis affix items of every rarity). Test only.
-var SC_Blocks = Java.loadClass("net.minecraft.world.level.block.Blocks")
+// /kubejs custom_command tinkers_test_chests: Sophisticated Storage netherite chests in a row east of the player, filled with
+// PAIRS (left: the item with our modifiers, right: what to compare it with), 4 pairs per row of 12 with a gap, each section on
+// a new row:
+//   1. tools/weapons and 2. armor made from our materials (kubejs:* and dragonsteel: Aether, Twilight Forest, Ice and Fire, AE2,
+//      Nature's Aura abilities and set bonuses) | the original item they replace (same material; the Tinkers version of a
+//      material always carries its ability)
+//   3. our knives | the original knife
+//   4. one tool per enchantment modifier (tinkersEnchantModifiers.js) at max level | the same Tinkers tool without it
+//   5. vanilla tools enchanted like loot (level 30) through the real loot conversion | the original enchanted item
+//   6. Apotheosis random affix loot, 2 per rarity | the same item without its affixes
+// Test only.
 var SC_ModifierId = Java.loadClass("slimeknights.tconstruct.library.modifiers.ModifierId")
 var SC_EnchHelper = Java.loadClass("net.minecraft.world.item.enchantment.EnchantmentHelper")
+var SC_ForgeRegistries = Java.loadClass("net.minecraftforge.registries.ForgeRegistries")
+var SC_ResourceLocation = Java.loadClass("net.minecraft.resources.ResourceLocation")
+var SC_CHEST = "sophisticatedstorage:netherite_chest"
+var SC_ROW = 12 // netherite chest: 132 slots, 12 per row
 var SC_LOOT_TOOLS = ["minecraft:iron_sword", "minecraft:iron_pickaxe", "minecraft:iron_axe", "minecraft:golden_sword",
     "minecraft:golden_pickaxe", "minecraft:diamond_sword", "minecraft:diamond_pickaxe", "minecraft:diamond_shovel",
     "minecraft:iron_helmet", "minecraft:diamond_chestplate", "minecraft:iron_boots"]
@@ -196,21 +206,25 @@ ServerEvents.customCommand("tinkers_test_chests", (event) => {
     if (!player) return
     global.tinkersEnsurePlan()
     let plan = global.TINKERS_PLAN
-    let stacks = []
+    let tools = []
+    let armor = []
+    let knives = []
     let seen = {}
-    let knives = 0
     Object.keys(plan).sort().forEach((id) => {
         let parts = global.tinkersPartsFor(id)
         if (!parts) return
         let ours = parts.mats.some((m) => m.indexOf("kubejs:") == 0 || m.indexOf("dragonsteel") >= 0)
         let knife = parts.tool == "kubejs:knife" || parts.tool == "kubejs:butcher_knife"
-        if (!ours && !(knife && knives < 2)) return
+        if (!ours && !(knife && knives.length < 2)) return
         let key = parts.tool + "|" + parts.mats.join(",")
         if (seen[key]) return
         seen[key] = true
-        if (!ours) knives++
-        stacks.push(global.tinkersStackFor(id))
+        let pair = [global.tinkersStackFor(id), Item.of(id)]
+        if (!ours) knives.push(pair)
+        else if (plan[id].armor) armor.push(pair)
+        else tools.push(pair)
     })
+    let enchanted = []
     let table = global.TINKERS_ENCH_MODIFIERS || {}
     Object.keys(table).forEach((ench) => {
         let e = table[ench]
@@ -222,45 +236,75 @@ ServerEvents.customCommand("tinkers_test_chests", (event) => {
             tool.addModifier(SC_ModifierId.tryParse(global.temModifierId(ench)), e.max || 1)
             tool.rebuildStats()
             stack.setHoverName(Text.of(global.temModifierId(ench)).gold())
-            stacks.push(stack)
+            enchanted.push([stack, global.tinkersStackFor(baseId)])
         } catch (err) {
             console.warn("[tinkers test chests] " + ench + ": " + err) // modifier missing (enchantment not registered)
         }
     })
     let level = player.level
     let rand = player.getRandom()
-    // random loot: vanilla tools enchanted like loot (level 30) through the real loot conversion (enchantments -> slotless
-    // modifiers + Shiny), and Apotheosis' random affix loot, 2 per rarity (common .. ancient)
+    let loot = []
     SC_LOOT_TOOLS.forEach((id) => {
         try {
-            let conv = global.toTinkersTool(SC_EnchHelper.enchantItem(rand, Item.of(id), 30, false))
-            if (conv) stacks.push(conv)
+            let orig = SC_EnchHelper.enchantItem(rand, Item.of(id), 30, false)
+            let conv = global.toTinkersTool(orig.copy())
+            if (conv) loot.push([conv, orig])
         } catch (err) {
             console.warn("[tinkers test chests] enchanted " + id + ": " + err)
         }
     })
+    let affixed = []
     try {
         let LootController = Java.loadClass("dev.shadowsoffire.apotheosis.adventure.loot.LootController")
         let RarityRegistry = Java.loadClass("dev.shadowsoffire.apotheosis.adventure.loot.RarityRegistry")
         for (let r = 0; r < 6; r++) {
             for (let n = 0; n < 2; n++) {
                 let item = LootController.createRandomLootItem(rand, RarityRegistry.byOrdinal(r).get(), player, level)
-                if (item && !item.isEmpty()) stacks.push(item)
+                if (!item || item.isEmpty()) continue
+                let plain = item.copy()
+                if (plain.nbt) {
+                    let tag = plain.nbt.copy()
+                    tag.remove("affix_data")
+                    plain.nbt = tag
+                }
+                affixed.push([item, plain])
             }
         }
     } catch (err) {
         console.warn("[tinkers test chests] Apotheosis affix loot: " + err)
     }
+
+    // place: pairs at columns 0/3/6/9 of a row, sections start on a new row, a full chest continues in the next one
+    let chestBlock = SC_ForgeRegistries.BLOCKS.getValue(new SC_ResourceLocation(SC_CHEST))
     let origin = player.blockPosition()
     let chests = 0
-    for (let i = 0; i < stacks.length; i += 27) {
+    let inv = null
+    let size = 0
+    let slot = 0
+    let items = 0
+    function nextChest() {
         let pos = origin.offset(2 + chests * 2, 0, 0)
-        level.setBlock(pos, SC_Blocks.CHEST.defaultBlockState(), 3)
-        let be = level.getBlockEntity(pos)
-        for (let k = 0; k < 27 && i + k < stacks.length; k++) be.setItem(k, stacks[i + k])
+        level.setBlock(pos, chestBlock.defaultBlockState(), 3)
+        inv = level.getBlockEntity(pos).getStorageWrapper().getInventoryHandler()
+        size = inv.getSlots()
+        slot = 0
         chests++
     }
-    let msg = "[tinkers test chests] " + stacks.length + " items in " + chests + " chests east of you (every 2nd block)"
+    nextChest()
+    ;[tools, armor, knives, enchanted, loot, affixed].forEach((section) => {
+        if (slot % SC_ROW != 0) slot += SC_ROW - (slot % SC_ROW) // new row
+        section.forEach((pair) => {
+            if (slot % SC_ROW > SC_ROW - 2) slot += SC_ROW - (slot % SC_ROW) // pair must fit in the row
+            if (slot + 1 >= size) nextChest()
+            inv.setStackInSlot(slot, pair[0])
+            if (pair[1]) inv.setStackInSlot(slot + 1, pair[1])
+            items += 2
+            slot += 3
+        })
+    })
+    let msg = "[tinkers test chests] " + items + " items (" + tools.length + " tools, " + armor.length + " armor, " + knives.length +
+        " knives, " + enchanted.length + " enchant modifiers, " + loot.length + " enchanted loot, " + affixed.length +
+        " affix loot) in " + chests + " chests east of you; left = ours, right = compare"
     console.info(msg)
     player.tell(msg)
 })
