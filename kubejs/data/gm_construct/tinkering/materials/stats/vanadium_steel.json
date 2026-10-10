@@ -16,6 +16,7 @@
       "durability": 1.25,
       "accuracy": 0.1,
       "melee_damage": 8.0
-    }
+    },
+    "tconstruct:binding": {}
   }
 }

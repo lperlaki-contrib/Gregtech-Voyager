@@ -1,0 +1,7 @@
+{
+  "showReplacedTools": false,
+  "removeStandInRecipes": true,
+  "removeUnmappedToolRecipes": false,
+  "craftableGoldenTools": false,
+  "convertArmor": true
+}

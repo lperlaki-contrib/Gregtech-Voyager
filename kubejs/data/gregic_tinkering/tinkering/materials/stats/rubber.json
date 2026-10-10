@@ -1,0 +1,12 @@
+{
+  "stats": {
+    "gregic_tinkering:plunger_head": {
+      "durability": 256,
+      "melee_attack": 0.0
+    },
+    "gregic_tinkering:soft_mallet_head": {
+      "durability": 120,
+      "melee_attack": 0.0
+    }
+  }
+}
