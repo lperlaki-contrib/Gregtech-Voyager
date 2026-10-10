@@ -12,6 +12,11 @@
 // Names are prefixed kmat/KUBEJS_ to avoid clashes with feat/tinkers-all-tools' global helpers (renderInfo, shade).
 // Rhino: no spread/destructuring, no const in loops.
 
+// shared palettes (7 stops, ARGB): vibrant orange-tinted gold (also applied to tconstruct:gold in
+// client_scripts/kubejsMaterialsAssets.js so golden tools, golden armor and valkyrie trim match) and a bright neutral white
+global.KMAT_GOLD_PALETTE = ["FF000000", "FF8A3A00", "FFD06A00", "FFFFA41A", "FFFFC93A", "FFFFE45C", "FFFFF8C8"]
+var KMAT_WHITE = ["FF000000", "FF6A6A70", "FF9C9CA3", "FFC6C6CC", "FFE2E2E6", "FFF4F4F6", "FFFFFFFF"]
+
 global.KUBEJS_MATERIALS = {
     aether_candy_cane: { t: 0, s: 40, c: false, col: "FF6B81", fb: ["metal"], st: "tool5", spr: "kubejs:generator/candy_stripes" },
     aether_flaming: { t: 3, s: 41, c: false, col: "FF7A1A", fb: ["metal"], st: "tool5" },
@@ -27,7 +32,7 @@ global.KUBEJS_MATERIALS = {
     dragonbone_lightning: { t: 3, s: 35, c: false, col: "9A6BF3", fb: ["bone", "rock"], st: "tool6" },
     dragonsteel_lightning: { t: 4, s: 38, c: false, col: "8A5CF5", fb: ["metal"], st: "tool6" },
     fluix: { t: 2, s: 31, c: true, col: "8F6BD0", fb: ["metal"], st: "tool6", r: [["ae2:fluix_crystal", 1]] },
-    gold: { t: 0, s: 41, c: false, col: "FDF55F", fb: ["metal"], st: "tool5", tex: "tconstruct:gold", pal: ["FF000000", "FF752802", "FFB26411", "FFE9B115", "FFFAD64A", "FFFDF55F", "FFFFFDE0"], r: [["#forge:ingots/gold", 1], ["#forge:nuggets/gold", 9]] },
+    gold: { t: 0, s: 41, c: false, col: "FDF55F", fb: ["metal"], st: "tool5", pal: global.KMAT_GOLD_PALETTE, r: [["#forge:ingots/gold", 1], ["#forge:nuggets/gold", 9]] },
     gravitite: { t: 3, s: 23, c: true, col: "E07AE0", fb: ["metal"], st: "tool6", r: [["aether:enchanted_gravitite", 1]] },
     holystone: { t: 1, s: 21, c: true, col: "B5B9B2", fb: ["rock"], st: "tool4", r: [["aether:holystone", 1]] },
     iaf_amphithere: { t: 2, s: 53, c: false, col: "5FA05F", fb: ["metal"], st: "tool5" },
@@ -48,7 +53,7 @@ global.KUBEJS_MATERIALS = {
     tf_glass: { t: 0, s: 48, c: false, col: "DDEEFF", fb: ["metal"], st: "tool5" },
     tf_ice: { t: 0, s: 49, c: false, col: "AEE6FF", fb: ["metal"], st: "tool5" },
     tf_mazebreaker: { t: 3, s: 50, c: false, col: "C8B27A", fb: ["metal"], st: "tool5" },
-    valkyrie: { t: 3, s: 39, c: false, col: "E8E4F0", fb: ["metal"], st: "tool5" },
+    valkyrie: { t: 3, s: 39, c: false, col: "E8E4F0", fb: ["metal"], st: "tool5", pal: KMAT_WHITE },
     zanite: { t: 2, s: 22, c: true, col: "7A5CD6", fb: ["metal"], st: "tool6", r: [["aether:zanite_gemstone", 1]] },
     // ---- armor-only materials (feat/tinkers-armor): plating/maille stats + traits in data/kubejs/tinkering/materials ----
     aether_neptune: { t: 2, s: 70, c: false, col: "4FA3E8", fb: ["metal"], st: "tool5" },
@@ -56,8 +61,8 @@ global.KUBEJS_MATERIALS = {
     aether_obsidian: { t: 3, s: 72, c: false, col: "2A1F3D", fb: ["metal"], st: "tool5" },
     aether_sentry: { t: 1, s: 73, c: false, col: "A8A8B0", fb: ["metal"], st: "tool5" },
     tf_naga: { t: 1, s: 74, c: false, col: "4C9A3C", fb: ["metal"], st: "tool5" },
-    tf_yeti: { t: 3, s: 75, c: false, col: "CFE8F5", fb: ["metal"], st: "tool5" },
-    tf_arctic: { t: 2, s: 76, c: false, col: "DDE9F0", fb: ["metal"], st: "tool5" },
+    tf_yeti: { t: 3, s: 75, c: false, col: "CFE8F5", fb: ["metal"], st: "tool5", pal: KMAT_WHITE },
+    tf_arctic: { t: 2, s: 76, c: false, col: "DDE9F0", fb: ["metal"], st: "tool5", pal: KMAT_WHITE },
     tf_phantom: { t: 2, s: 77, c: false, col: "B8C4D8", fb: ["metal"], st: "tool5" },
     iaf_dragon_scale: { t: 2, s: 78, c: false, col: "C0392B", fb: ["metal"], st: "tool5" },
     iaf_tide: { t: 3, s: 79, c: false, col: "2BB3A4", fb: ["metal"], st: "tool5" },
