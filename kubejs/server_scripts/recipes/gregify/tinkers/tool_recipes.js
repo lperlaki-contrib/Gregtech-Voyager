@@ -45,6 +45,9 @@ global.tinkersUpgradeStack = (stack, fromMat, toMats) => {
     out.setCount(1)
     return out
 }
+// tags that only held converted tools (empty after tcon/replaced_tool_tags.js) -> the plan id whose "any Tinkers tool" input replaces them
+// (found by /kubejs custom_command tinkers_input_check, EMPTY INPUT lines)
+var TR_TAG_INPUTS = { "forge:tools/metal/axes": "minecraft:iron_axe" }
 var TR_SKIP_TYPE = /^(tconstruct:|minecraft:(smelting|blasting|smoking|campfire_cooking)$)|melting|recycl|salvag|repair|^gtceu:(?!.*crafting)/
 ServerEvents.recipes((event) => {
     global.tinkersEnsurePlan() // plan may not be built yet (startup order)
@@ -136,26 +139,26 @@ ServerEvents.recipes((event) => {
         }
         return inputCache[id]
     }
-    // replace every {"item": id} object outside the result keys (schema-less recipe types: KubeJS replaceInput can't see them)
-    function replaceInJson(node, id, ingJson) {
+    // replace every {<key>: id} object ({"item": ...} or {"tag": ...}) outside the result keys (schema-less recipe types: KubeJS replaceInput can't see them)
+    function replaceInJson(node, id, ingJson, key) {
         let n = 0
         if (node instanceof TR_JsonArray) {
             for (let i = 0; i < node.size(); i++) {
                 let el = node.get(i)
-                if (el instanceof TR_JsonObject && el.has("item") && String(el.get("item").getAsString()) == id && !el.has("type")) {
+                if (el instanceof TR_JsonObject && el.has(key) && String(el.get(key).getAsString()) == id && !el.has("type")) {
                     node.set(i, ingJson.deepCopy())
                     n++
-                } else n += replaceInJson(el, id, ingJson)
+                } else n += replaceInJson(el, id, ingJson, key)
             }
         } else if (node instanceof TR_JsonObject) {
             node.keySet().toArray().forEach((k) => {
                 k = String(k)
                 if (OUTPUT_KEYS.indexOf(k) >= 0) return
                 let el = node.get(k)
-                if (el instanceof TR_JsonObject && el.has("item") && String(el.get("item").getAsString()) == id && !el.has("type")) {
+                if (el instanceof TR_JsonObject && el.has(key) && String(el.get(key).getAsString()) == id && !el.has("type")) {
                     node.add(k, ingJson.deepCopy())
                     n++
-                } else n += replaceInJson(el, id, ingJson)
+                } else n += replaceInJson(el, id, ingJson, key)
             })
         }
         return n
@@ -170,9 +173,26 @@ ServerEvents.recipes((event) => {
         if (TR_SKIP_TYPE.test(type)) return
         let ids = {}
         let found = false
-        let m = TR_ITEM_P.matcher(j.toString())
+        let js = j.toString()
+        let tagDone = []
+        let tagJson = false // edited only in the JSON: re-added as a custom recipe (a schema recipe would re-serialize its old inputs)
+        Object.keys(TR_TAG_INPUTS).forEach((t) => {
+            let rep = TR_TAG_INPUTS[t]
+            if (js.indexOf('"tag":"' + t + '"') < 0 || !plan[rep]) return
+            let done = false
+            try {
+                done = r.replaceInput("#" + t, inputFor(rep))
+            } catch (e) {}
+            if (!done) {
+                if (replaceInJson(j, t, inputFor(rep).toJson(), "tag") == 0) return
+                tagJson = true
+            }
+            tagDone.push(rep)
+            inputsReplaced++
+        })
+        let m = TR_ITEM_P.matcher(js)
         while (m.find() && !found) found = !!plan[String(m.group("id"))]
-        if (!found) return
+        if (!found && tagDone.length == 0) return
         // a plan id somewhere: rescan without the output keys, so a tool recipe's own result does not count as an input
         let probe = j.deepCopy()
         OUTPUT_KEYS.forEach((k) => probe.remove(k))
@@ -181,15 +201,15 @@ ServerEvents.recipes((event) => {
             let id = String(m.group("id"))
             if (plan[id] && (cfg.convertArmor || !plan[id].armor)) ids[id] = true
         }
-        let edited = false
-        let doneIds = []
+        let edited = tagDone.length > 0
+        let doneIds = tagDone
         Object.keys(ids).forEach((id) => {
             let ing = inputFor(id)
             let done = false
             try {
                 done = r.replaceInput(id, ing)
             } catch (e) {}
-            if (!done) done = replaceInJson(j, id, ing.toJson()) > 0
+            if (!done) done = replaceInJson(j, id, ing.toJson(), "item") > 0
             if (done) {
                 doneIds.push(id)
                 edited = true
@@ -197,15 +217,15 @@ ServerEvents.recipes((event) => {
             }
         })
         if (edited) {
+            let im = IMPOSTOR_RE.exec(type)
+            let copy = im || tagJson ? j.deepCopy() : null // before save(): a schema recipe may re-serialize its old inputs into the JSON
             r.save()
             inputRecipes.push(String(r.getId()))
             global.TINKERS_INPUT_RECIPES[String(r.getId())] = doneIds
             // ComputerCraft's impostor recipes (turtle + tool -> turtle with upgrade) never match: they only display the upgrade,
             // the real crafting accepts only the exact upgrade item. Re-add them as normal crafting recipes (same pattern/result).
-            let im = IMPOSTOR_RE.exec(type)
-            if (im) {
-                let copy = j.deepCopy()
-                copy.addProperty("type", "minecraft:crafting_" + im[1])
+            if (copy) {
+                if (im) copy.addProperty("type", "minecraft:crafting_" + im[1])
                 impostors.push([String(r.getId()), copy])
                 delete global.TINKERS_INPUT_RECIPES[String(r.getId())]
                 global.TINKERS_INPUT_RECIPES["kubejs:tinkers_input/" + String(r.getId()).replace(":", "/")] = doneIds
@@ -342,7 +362,7 @@ ServerEvents.recipes((event) => {
         removeIds.push(pair[0])
         event.custom(pair[1]).id("kubejs:tinkers_input/" + pair[0].replace(":", "/"))
     })
-    if (impostors.length > 0) console.info("[tinkers tools] " + impostors.length + " ComputerCraft upgrade recipes re-added as real crafting recipes")
+    if (impostors.length > 0) console.info("[tinkers tools] " + impostors.length + " recipes re-added with substituted inputs (ComputerCraft upgrades as real crafting, JSON-edited tag inputs)")
     // Removed, not swapped: stand-in tools (e.g. diamond pickaxe -> cobalt), golden tools (unless craftable), unmapped tools
     // (removeUnmappedToolRecipes), non-GT duplicates, ComputerCraft impostors (re-added above) and GT's dragonsteel armor.
     removeIds.forEach((id) => { delete global.TINKERS_INPUT_RECIPES[id] }) // removed on purpose (stand-ins, gold, impostors)
