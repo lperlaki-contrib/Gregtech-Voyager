@@ -14,6 +14,7 @@ var SC_ArmorItem = Java.loadClass("net.minecraft.world.item.ArmorItem")
 var SC_IGTTool = Java.loadClass("com.gregtechceu.gtceu.api.item.IGTTool")
 var SC_MAINHAND = Java.loadClass("net.minecraft.world.entity.EquipmentSlot").MAINHAND
 var SC_ATTACK = Java.loadClass("net.minecraft.world.entity.ai.attributes.Attributes").ATTACK_DAMAGE
+var SC_EMPTY = Java.loadClass("net.minecraft.world.item.crafting.Ingredient").EMPTY
 
 ServerEvents.customCommand("tinkers_stat_check", (event) => {
     global.tinkersEnsurePlan()
@@ -143,10 +144,28 @@ ServerEvents.customCommand("tinkers_input_check", (event) => {
             wrong.push(rid + " (" + e + ")")
         }
     })
+    // recipes with a slot nothing can fill (e.g. a tag that only held tools replaced_tool_tags.js removed); blank shaped
+    // slots are the shared Ingredient.EMPTY and are skipped
+    let emptySlots = []
+    rm.getRecipes().forEach((recipe) => {
+        try {
+            let ings = recipe.getIngredients()
+            for (let i = 0; i < ings.size(); i++) {
+                let ing = ings.get(i)
+                if (ing !== SC_EMPTY && ing.getStacks().toArray().length == 0) {
+                    emptySlots.push(String(recipe.getId()))
+                    return
+                }
+            }
+        } catch (e) {
+            // mod recipes that can't list their ingredients
+        }
+    })
+    emptySlots.sort().forEach((r) => console.warn("[tinkers input check] EMPTY INPUT (nothing can fill a slot): " + r))
     missing.forEach((r) => console.warn("[tinkers input check] MISSING (removed by another script, or failed to load): " + r))
     wrong.forEach((r) => console.warn("[tinkers input check] tier check wrong: " + r))
     opaque.forEach((r) => console.info("[tinkers input check] not inspectable (mod recipe hides its ingredients), spot-test: " + r))
-    let summary = "[tinkers input check] " + ok + " ok, " + missing.length + " missing, " + wrong.length + " wrong, " + opaque.length + " not inspectable"
+    let summary = "[tinkers input check] " + ok + " ok, " + missing.length + " missing, " + emptySlots.length + " empty input, " + wrong.length + " wrong, " + opaque.length + " not inspectable"
     console.info(summary)
     if (event.player) event.player.tell(summary)
 })
