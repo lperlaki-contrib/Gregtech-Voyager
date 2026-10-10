@@ -3,11 +3,8 @@ var TC_ToolStack = Java.loadClass("slimeknights.tconstruct.library.tools.nbt.Too
 // /kubejs custom_command tinkers_test_chests: Sophisticated Storage netherite chests in a row east of the player, filled with
 // PAIRS (left: the item with our modifiers, right: what to compare it with), 4 pairs per row of 12 with a gap, each section on
 // a new row:
-//   1. tools/weapons and 2. armor made from our materials (kubejs:* and dragonsteel: Aether, Twilight Forest, Ice and Fire, AE2,
-//      Nature's Aura abilities and set bonuses) | the original item they replace (same material; the Tinkers version of a
-//      material always carries its ability)
+//   1. tools/weapons and 2. armor made from our materials (kubejs:*) | the original item they replace
 //   3. our knives | the original knife
-//   3a. bows, crossbows, shields | the original
 //   3b. powered tools, one per GT tool type and voltage: gregic Tinkers version | GT's original, both fully charged
 //   4. one tool per enchantment modifier (tinkersEnchantModifiers.js) at max level | the same Tinkers tool without it
 //   5. vanilla tools enchanted like loot (level 30) through the real loot conversion | the original enchanted item
@@ -20,7 +17,6 @@ var TC_ForgeRegistries = Java.loadClass("net.minecraftforge.registries.ForgeRegi
 var TC_ResourceLocation = Java.loadClass("net.minecraft.resources.ResourceLocation")
 var TC_GTCap = Java.loadClass("com.gregtechceu.gtceu.api.capability.GTCapabilityHelper")
 var TC_CHEST = "sophisticatedstorage:netherite_chest"
-var TC_RANGED = ["bow", "crossbow", "shield"] // plan types of feat/tinkers-ranged
 var TC_ROW = 12 // netherite chest: 132 slots, 12 per row
 var TC_LOOT_TOOLS = ["minecraft:iron_sword", "minecraft:iron_pickaxe", "minecraft:iron_axe", "minecraft:golden_sword",
     "minecraft:golden_pickaxe", "minecraft:diamond_sword", "minecraft:diamond_pickaxe", "minecraft:diamond_shovel",
@@ -41,9 +37,6 @@ var TC_SUPPLIES = [
     // saplings + bone meal (Chainsaw on grown trees), seeds (Nature's Blessing), obsidian (giant pickaxe)
     ["minecraft:stone", 64], ["minecraft:deepslate", 64], ["minecraft:dirt", 64], ["minecraft:sand", 64], ["minecraft:gravel", 64],
     ["minecraft:oak_sapling", 16], ["minecraft:bone_meal", 64], ["minecraft:wheat_seeds", 32], ["minecraft:obsidian", 16],
-    // upgrade recipes: fiery (Twilight Forest), fluix smithing (AE2), ghost sword (Ice and Fire)
-    ["twilightforest:fiery_blood", 16], ["twilightforest:fiery_tears", 16], ["minecraft:blaze_rod", 16],
-    ["ae2:fluix_upgrade_smithing_template", 4], ["ae2:fluix_block", 8], ["iceandfire:ghost_ingot", 4], ["minecraft:smithing_table", 1],
     // Apotheosis sockets: sigils + the enchantment-level gems (Earth, Inferno, Endersurge)
     ["apotheosis:sigil_of_socketing", 16], ["apotheosis:sigil_of_withdrawal", 8],
     ["apotheosis:gem", 1, { gem: "apotheosis:overworld/earth", rarity: "apotheosis:mythic" }],
@@ -84,8 +77,8 @@ ServerEvents.customCommand("tinkers_test_chests", (event) => {
     let seen = {}
     Object.keys(plan).sort().forEach((id) => {
         let parts = global.tinkersPartsFor(id)
-        if (!parts || TC_RANGED.indexOf(plan[id].type) >= 0) return // own section below
-        let ours = parts.mats.some((m) => m.indexOf("kubejs:") == 0 || m.indexOf("dragonsteel") >= 0)
+        if (!parts) return
+        let ours = parts.mats.some((m) => m.indexOf("kubejs:") == 0)
         let knife = parts.tool == "kubejs:knife" || parts.tool == "kubejs:butcher_knife"
         if (!ours && !(knife && knives.length < 2)) return
         let key = parts.tool + "|" + parts.mats.join(",")
@@ -95,17 +88,6 @@ ServerEvents.customCommand("tinkers_test_chests", (event) => {
         if (!ours) knives.push(pair)
         else if (plan[id].armor) armor.push(pair)
         else tools.push(pair)
-    })
-    // bows, crossbows, shields (feat/tinkers-ranged): every converted one | its original
-    let ranged = []
-    Object.keys(plan).sort().forEach((id) => {
-        let p = plan[id]
-        if (TC_RANGED.indexOf(p.type) < 0) return
-        let parts = global.tinkersPartsFor(id)
-        let key = parts.tool + "|" + parts.mats.join(",")
-        if (seen[key]) return
-        seen[key] = true
-        ranged.push([global.tinkersStackFor(id), Item.of(id)])
     })
     // powered tools: one per GT tool type and voltage, the gregic Tinkers version | GT's original, both fully charged
     let powered = []
@@ -199,7 +181,7 @@ ServerEvents.customCommand("tinkers_test_chests", (event) => {
     }
     nextChest()
     
-    ;[tools, armor, knives, ranged, powered, enchanted, loot, affixed].forEach((section) => {
+    ;[tools, armor, knives, powered, enchanted, loot, affixed].forEach((section) => {
         if (slot % TC_ROW != 0) slot += TC_ROW - (slot % TC_ROW) // new row
         section.forEach((pair) => {
             if (slot % TC_ROW > TC_ROW - 2) slot += TC_ROW - (slot % TC_ROW) // pair must fit in the row
@@ -218,7 +200,7 @@ ServerEvents.customCommand("tinkers_test_chests", (event) => {
         items++
     })
     let msg = "[tinkers test chests] " + items + " items (" + tools.length + " tools, " + armor.length + " armor, " + knives.length +
-        " knives, " + ranged.length + " bows/shields, " + powered.length + " powered, " + enchanted.length + " enchant modifiers, " + loot.length + " enchanted loot, " + affixed.length +
+        " knives, " + powered.length + " powered, " + enchanted.length + " enchant modifiers, " + loot.length + " enchanted loot, " + affixed.length +
         " affix loot, " + supplies.length + " supplies) in " + chests + " chests east of you; left = ours, right = compare"
     console.info(msg)
     player.tell(msg)
