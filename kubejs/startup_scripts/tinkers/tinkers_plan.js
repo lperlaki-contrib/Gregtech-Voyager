@@ -142,6 +142,7 @@ const ONLY_NS = {
 // namespaces never converted (special abilities / not plain tools); reason is logged
 const SKIP_NS = {
     botania: "mana tools (self-repair, terra blade, ...)",
+    bloodmagic: "sentient tools (demon will drops need its own weapon class, will-scaled powers)",
     forbidden_arcanus: "draco arcanus / deorum special tools",
     occultism: "ritual tools (iesnium/infused pickaxe)",
     ars_nouveau: "spell sword",
