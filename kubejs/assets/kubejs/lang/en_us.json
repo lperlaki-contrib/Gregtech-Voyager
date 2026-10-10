@@ -183,5 +183,14 @@
     "gtceu.helper_assembler": "Helper Assembler",
     "gtceu.oven": "Oven",
 
-    "gtceu.radiation_chamber": "Radiation Chamber"
+    "gtceu.radiation_chamber": "Radiation Chamber",
+    "item.kubejs.knife": "Knife",
+    "item.kubejs.shovel": "Shovel",
+    "item.kubejs.butcher_knife": "Butcher Knife",
+    "modifier.kubejs.knife_handling": "Knife Handling",
+    "modifier.kubejs.knife_handling.flavor": "Cut, don't push",
+    "modifier.kubejs.knife_handling.description": "Greatly reduces knockback so mobs stay in reach, like a kitchen knife",
+    "item.kubejs.knife.description": "A small, quick blade. Works as a GregTech crafting knife (losing durability with each craft) and as a Farmer's Delight knife for the cutting board and harvesting straw.",
+    "item.kubejs.butcher_knife.description": "A heavy one-handed chopping knife. Butchers animals for extra drops (built-in Looting), works on the cutting board and in Hearth & Harvest sausage recipes, and counts as a butcher knife for Occultism's tallow.",
+    "item.kubejs.shovel.description": "A plain digging tool, just like a vanilla shovel: digs dirt, sand and gravel; right-click to make paths and douse campfires."
 }
