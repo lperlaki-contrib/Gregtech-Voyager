@@ -1,0 +1,100 @@
+{
+  "weight": 40,
+  "mainhands": [
+    {
+      "weight": 3,
+      "stack": {
+        "item": "tconstruct:sword",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:manyullyn",
+            "tconstruct:wood",
+            "tconstruct:manyullyn"
+          ]
+        }
+      }
+    },
+    {
+      "weight": 3,
+      "stack": {
+        "item": "tconstruct:hand_axe",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:manyullyn",
+            "tconstruct:wood",
+            "tconstruct:manyullyn"
+          ]
+        }
+      }
+    },
+    {
+      "weight": 2,
+      "stack": {
+        "item": "tconstruct:pickaxe",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:manyullyn",
+            "tconstruct:wood",
+            "tconstruct:manyullyn"
+          ]
+        }
+      }
+    },
+    {
+      "weight": 2,
+      "stack": {
+        "item": "kubejs:shovel",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:manyullyn",
+            "tconstruct:wood",
+            "tconstruct:manyullyn"
+          ]
+        }
+      }
+    }
+  ],
+  "offhands": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:shield"
+      }
+    }
+  ],
+  "boots": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:netherite_boots"
+      }
+    }
+  ],
+  "leggings": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:netherite_leggings"
+      }
+    }
+  ],
+  "chestplates": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:netherite_chestplate"
+      }
+    }
+  ],
+  "helmets": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:netherite_helmet"
+      }
+    }
+  ],
+  "tags": [
+    "the_end"
+  ]
+}

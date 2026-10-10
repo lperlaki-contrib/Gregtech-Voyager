@@ -1,0 +1,20 @@
+{
+  "dimensions": [
+    "minecraft:the_end"
+  ],
+  "min_rarity": "apotheosis:rare",
+  "max_rarity": "apotheosis:mythic",
+  "weight": 70,
+  "quality": 10,
+  "stack": {
+    "item": "tconstruct:hand_axe",
+    "count": 1,
+    "nbt": {
+      "tic_materials": [
+        "tconstruct:manyullyn",
+        "tconstruct:wood",
+        "tconstruct:manyullyn"
+      ]
+    }
+  }
+}
