@@ -18,7 +18,7 @@ global.KMAT_GOLD_PALETTE = ["FF000000", "FF6E4A10", "FFA06A12", "FFD99413", "FFE
 var KMAT_WHITE = ["FF000000", "FF6A6A70", "FF9C9CA3", "FFC6C6CC", "FFE2E2E6", "FFF4F4F6", "FFFFFFFF"]
 
 global.KUBEJS_MATERIALS = {
-    aether_candy_cane: { t: 0, s: 40, c: false, col: "FF6B81", fb: ["metal"], st: "tool5", spr: "kubejs:generator/candy_stripes" },
+    aether_candy_cane: { t: 0, s: 40, c: false, col: "FF6B81", fb: ["metal"], st: "tool5", spr: "kubejs:generator/candy_stripes", r: [["aether:candy_cane", 1]] }, // repaired with candy canes (Aether: candy_cane_repairing)
     aether_flaming: { t: 3, s: 41, c: false, col: "FF7A1A", fb: ["metal"], st: "tool5" },
     aether_hammer_of_kingbdogz: { t: 2, s: 46, c: false, col: "8A6A40", fb: ["metal"], st: "tool5" },
     aether_holy: { t: 3, s: 42, c: false, col: "F5E7A1", fb: ["metal"], st: "tool5" },
