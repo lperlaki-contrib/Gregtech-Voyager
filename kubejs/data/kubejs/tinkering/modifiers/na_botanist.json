@@ -1,0 +1,24 @@
+{
+  "level_display": "tconstruct:no_levels",
+  "tooltip_display": "always",
+  "modules": [
+    {
+      "type": "tconstruct:conditional_mining_speed",
+      "formula": [
+        "$speed",
+        6.0,
+        "max"
+      ],
+      "percent": false,
+      "require_effective": false,
+      "blocks": { "type": "mantle:tag", "tag": "minecraft:leaves" },
+      "tool": {
+        "type": "mantle:set",
+        "items": [
+          "tconstruct:hand_axe",
+          "tconstruct:broad_axe"
+        ]
+      }
+    }
+  ]
+}

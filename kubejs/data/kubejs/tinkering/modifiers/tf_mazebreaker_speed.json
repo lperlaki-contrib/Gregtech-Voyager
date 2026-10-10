@@ -1,0 +1,17 @@
+{
+  "level_display": "tconstruct:no_levels",
+  "modules": [
+    {
+      "type": "tconstruct:conditional_mining_speed",
+      "formula": [
+        "$speed",
+        16.0,
+        "*"
+      ],
+      "percent": false,
+      "require_effective": false,
+      "blocks": { "type": "mantle:tag", "tag": "twilightforest:mazebreaker_accelerated_mining" }
+    }
+  ],
+  "tooltip_display": "always"
+}

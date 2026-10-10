@@ -73,6 +73,12 @@ ServerEvents.tags("item", (event) => {
         event.add("farmersdelight:tools/knives", event.get("gtceu:tools/crafting_knives").getObjectIds())
         event.add("forge:tools/knives", event.get("gtceu:tools/crafting_knives").getObjectIds())
     // })
+
+    // Butcher knives/cleavers are converted to the Tinkers butcher knife (startup_scripts/tinkers/tinkers_plan.js, TINKERS_BUTCHER_KNIFE):
+    // Occultism checks occultism:tools/knives in its tallow loot modifiers, H&H sausage recipes use #hearthandharvest:cleavers.
+    // (#hearthandharvest:cleavers is already inside farmersdelight:tools/knives)
+    event.add("occultism:tools/knives", global.TINKERS_BUTCHER_KNIFE[0])
+    event.add("hearthandharvest:cleavers", global.TINKERS_BUTCHER_KNIFE[0])
     /**
      * @param {string} tier
      */

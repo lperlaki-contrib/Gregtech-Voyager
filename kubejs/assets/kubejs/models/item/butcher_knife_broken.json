@@ -1,0 +1,22 @@
+{
+  "loader": "tconstruct:tool",
+  "parent": "tconstruct:item/base/axe",
+  "textures": {
+    "head": "kubejs:item/tool/butcher_knife/blade_broken",
+    "handle": "kubejs:item/tool/butcher_knife/handle"
+  },
+  "modifier_roots": [
+    "tconstruct:item/tool/cleaver/modifiers/broken/",
+    "tconstruct:item/tool/cleaver/modifiers/"
+  ],
+  "parts": [
+    {
+      "name": "handle",
+      "index": 1
+    },
+    {
+      "name": "head",
+      "index": 0
+    }
+  ]
+}

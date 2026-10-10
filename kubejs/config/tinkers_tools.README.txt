@@ -1,0 +1,28 @@
+kubejs/config/tinkers_tools.json (read by startup_scripts/tinkers/tinkers_plan.js -> global.tinkersConfig(); missing/invalid = defaults)
+
+showReplacedTools (default false)
+  true: the original tools that were replaced by Tinkers tools stay visible in EMI/JEI. false: they are hidden.
+  Apply: in-game resource reload (F3+T) re-reads it for EMI hiding. JEI's hide list is built when JEI loads (world join), so
+  a JEI change may need re-joining the world.
+
+removeStandInRecipes (default true)
+  Recipes whose tool only maps to a stand-in material (diamond -> cobalt, netherite -> manyullyn).
+  true: those recipes are removed. false: the original recipe and output are kept unchanged. Loot/mobs always convert.
+  Apply: /reload (server recipe event).
+
+removeUnmappedToolRecipes (default false)
+  Plain tools (pickaxe/axe/shovel/hoe/sword) that could not be mapped to any Tinkers material (see the "skipped" list in
+  logs/kubejs/server.log; special-ability mods in SKIP_NS are excluded). true: their recipes are removed.
+  Apply: /reload.
+
+craftableGoldenTools (default false)
+  true: golden tool / knife / cleaver recipes are kept and converted to Tinkers tools with the kubejs:gold head (the vanilla golden
+  tool recipe removal in recipes/gt/misc.js is skipped). false: golden recipes are removed; golden tools only come from loot.
+  Apply: /reload.
+
+convertArmor (default true)
+  true: vanilla (iron, gold, diamond, netherite, leather), Aether, Twilight Forest and Ice and Fire armor becomes Tinkers armor
+  (plate armor, leather -> travelers gear) in recipes, loot and mob equipment. Iron/gold/mod armor recipes are swapped (golden armor stays
+  craftable as Tinkers gold plate armor, independent of craftableGoldenTools); diamond/netherite are stand-ins (cobalt/manyullyn): recipes removed or left per removeStandInRecipes.
+  false: armor is untouched everywhere (recipes, loot, mobs, EMI/JEI).
+  Apply: /reload (recipes, loot, EMI hide); the set-bonus handler (startup_scripts/tinkers_armor_sets.js) only reacts to Tinkers armor.

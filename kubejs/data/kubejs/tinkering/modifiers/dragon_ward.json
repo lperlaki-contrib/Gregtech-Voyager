@@ -1,0 +1,20 @@
+{
+  "level_display": "tconstruct:default",
+  "modules": [
+    {
+      "type": "tconstruct:protection",
+      "damage_source": {
+        "type": "mantle:and",
+        "predicates": [
+          "mantle:can_protect",
+          {
+            "type": "mantle:tag",
+            "tag": "kubejs:protection/dragon_breath"
+          }
+        ]
+      },
+      "each_level": 2.5
+    }
+  ],
+  "tooltip_display": "always"
+}

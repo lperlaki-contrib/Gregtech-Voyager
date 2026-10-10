@@ -1,0 +1,14 @@
+{
+  "default": [
+    {
+      "level": 1,
+      "name": "kubejs:myrmex_chitin"
+    }
+  ],
+  "perStat": {
+    "tconstruct:plating_boots": [],
+    "tconstruct:plating_leggings": [],
+    "tconstruct:plating_chestplate": [],
+    "tconstruct:plating_helmet": []
+  }
+}

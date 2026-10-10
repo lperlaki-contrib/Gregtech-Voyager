@@ -1,0 +1,14 @@
+{
+  "perStat": {
+    "tconstruct:head": [
+      {
+        "level": 1,
+        "name": "tconstruct:fortune"
+      },
+      {
+        "level": 1,
+        "name": "tconstruct:looting"
+      }
+    ]
+  }
+}
