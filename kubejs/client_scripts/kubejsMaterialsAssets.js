@@ -37,10 +37,6 @@ ClientEvents.highPriorityAssets(function (event) {
     })
     event.add("emi:index/stacks/kubejs_02_kmat_hide_kits", { removed: removed })
 
-    // Tinkers' gold (golden armor plating, valkyrie maille) uses OUR gold sprites (kubejs:gold, generated from the vibrant
-    // global.KMAT_GOLD_PALETTE): the jar ships pre-made tconstruct_gold sprites, which a palette change would not touch
-    event.add("tconstruct:tinkering/materials/gold", { color: "FFFFC93A", fallbacks: ["metal"], texture: "kubejs:gold" })
-
     // Leather armor converts to leather travelers gear: tconstruct:leather got plating stats (data/tconstruct/.../stats/leather.json),
     // so its render info (copy of the jar's leather.json) needs the plating stats too.
     event.add("tconstruct:tinkering/materials/leather", {
