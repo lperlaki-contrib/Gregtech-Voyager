@@ -8,9 +8,9 @@
         "item": "tconstruct:sword",
         "nbt": {
           "tic_materials": [
-            "tconstruct:rock",
+            "tconstruct:rock#stone",
             "tconstruct:wood",
-            "tconstruct:rock"
+            "tconstruct:rock#stone"
           ]
         }
       }
@@ -21,9 +21,9 @@
         "item": "tconstruct:hand_axe",
         "nbt": {
           "tic_materials": [
-            "tconstruct:rock",
+            "tconstruct:rock#stone",
             "tconstruct:wood",
-            "tconstruct:rock"
+            "tconstruct:rock#stone"
           ]
         }
       }
@@ -34,9 +34,9 @@
         "item": "tconstruct:pickaxe",
         "nbt": {
           "tic_materials": [
-            "tconstruct:rock",
+            "tconstruct:rock#stone",
             "tconstruct:wood",
-            "tconstruct:rock"
+            "tconstruct:rock#stone"
           ]
         }
       }
@@ -47,9 +47,9 @@
         "item": "kubejs:shovel",
         "nbt": {
           "tic_materials": [
-            "tconstruct:rock",
+            "tconstruct:rock#stone",
             "tconstruct:wood",
-            "tconstruct:rock"
+            "tconstruct:rock#stone"
           ]
         }
       }
