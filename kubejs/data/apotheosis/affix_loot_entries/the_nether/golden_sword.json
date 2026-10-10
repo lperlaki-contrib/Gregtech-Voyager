@@ -1,0 +1,20 @@
+{
+  "dimensions": [
+    "minecraft:the_nether"
+  ],
+  "min_rarity": "apotheosis:uncommon",
+  "max_rarity": "apotheosis:epic",
+  "weight": 85,
+  "quality": 5,
+  "stack": {
+    "item": "tconstruct:sword",
+    "count": 1,
+    "nbt": {
+      "tic_materials": [
+        "kubejs:gold",
+        "tconstruct:wood",
+        "kubejs:gold"
+      ]
+    }
+  }
+}

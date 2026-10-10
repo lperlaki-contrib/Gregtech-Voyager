@@ -1,0 +1,20 @@
+{
+  "dimensions": [
+    "minecraft:overworld"
+  ],
+  "min_rarity": "apotheosis:common",
+  "max_rarity": "apotheosis:rare",
+  "weight": 85,
+  "quality": 4,
+  "stack": {
+    "item": "tconstruct:hand_axe",
+    "count": 1,
+    "nbt": {
+      "tic_materials": [
+        "tconstruct:iron",
+        "tconstruct:wood",
+        "tconstruct:iron"
+      ]
+    }
+  }
+}
