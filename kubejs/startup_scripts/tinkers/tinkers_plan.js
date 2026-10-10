@@ -124,7 +124,8 @@ const PLUNGER_MATERIALS = [
 //   STAND_IN aliases: no exact Tinkers equivalent; recipes NEVER swap to these (removed or left as the original, config
 //   removeStandInRecipes), loot always converts. p.standIn -> p.substitute is set ONLY from this provenance (and SPECIAL flags).
 const EXACT_ALIAS = {
-    wooden: "wood", planks: "wood", stone: "rock", cobblestone: "rock", cobbled_deepslate: "rock", blackstone: "rock"
+    // rock variants: the plain tconstruct:rock is named "Rock" (Tinkers' own stone tools are tconstruct:rock#stone)
+    wooden: "wood", planks: "wood", stone: "rock#stone", cobblestone: "rock#stone", cobbled_deepslate: "rock#stone", blackstone: "rock#blackstone"
 }
 const STAND_IN_ALIAS = { diamond: "cobalt", netherite: "manyullyn" }
 // vanilla Tiers enum constant -> material name (data: the tool's actual tier object, not its id)
@@ -334,7 +335,7 @@ const genericMaterial = (name) => {
         name = STAND_IN_ALIAS[name]
         standIn = true
     } else if (EXACT_ALIAS[name]) name = EXACT_ALIAS[name]
-    if (TCON_HEAD.indexOf(name) >= 0) return { mat: "tconstruct:" + name, standIn: standIn }
+    if (TCON_HEAD.indexOf(name.split("#")[0]) >= 0) return { mat: "tconstruct:" + name, standIn: standIn }
     if (GM_IGNORED.indexOf(name) < 0 && gtHasTool(name)) return { mat: "gm_construct:" + name, standIn: false }
     return null
 }
