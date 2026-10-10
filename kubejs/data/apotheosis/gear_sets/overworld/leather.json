@@ -47,7 +47,6 @@
         "nbt": {
           "tic_materials": [
             "tconstruct:wood",
-            "tconstruct:wood",
             "tconstruct:wood"
           ]
         }

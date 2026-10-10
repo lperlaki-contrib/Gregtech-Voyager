@@ -12,8 +12,7 @@
     "nbt": {
       "tic_materials": [
         "kubejs:gold",
-        "tconstruct:wood",
-        "kubejs:gold"
+        "tconstruct:wood"
       ]
     }
   }
