@@ -8,5 +8,11 @@
     "material.gm_construct": {
         "dragonsteel_fire": "#f35b75",
         "dragonsteel_ice": "#5baff3"
+    },
+    "material.kubejs": {
+        "gold": "#fdf55f"
+    },
+    "modifier.kubejs": {
+        "knife_handling": "#c9a24a"
     }
 }

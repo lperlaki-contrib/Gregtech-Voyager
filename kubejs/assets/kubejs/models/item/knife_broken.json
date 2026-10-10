@@ -1,0 +1,22 @@
+{
+  "loader": "tconstruct:tool",
+  "parent": "tconstruct:item/tool/dagger/display",
+  "textures": {
+    "head": "kubejs:item/tool/knife/blade_broken",
+    "crossguard": "kubejs:item/tool/knife/handle"
+  },
+  "modifier_roots": [
+    "tconstruct:item/tool/dagger/modifiers/broken/",
+    "tconstruct:item/tool/dagger/modifiers/"
+  ],
+  "parts": [
+    {
+      "name": "head",
+      "index": 0
+    },
+    {
+      "name": "crossguard",
+      "index": 1
+    }
+  ]
+}
