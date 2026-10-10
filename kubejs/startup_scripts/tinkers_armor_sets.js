@@ -175,7 +175,7 @@ ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingHurtEvent", ta
     var v = event.entity
     if (v.isPlayer() && atk.isLiving()) {
         var fv = TAS_FLAGS[String(v.stringUUID)]
-        if (fv !== undefined && fv.yeti > 0) atk.potionEffects.add("twilightforest:frosty", 5 * fv.yeti + 5, fv.yeti)
+        if (fv !== undefined && fv.yeti > 0) atk.potionEffects.add("twilightforest:frosted", 5 * fv.yeti + 5, fv.yeti)
     }
 }))
 

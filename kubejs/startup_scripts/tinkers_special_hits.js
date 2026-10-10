@@ -235,7 +235,7 @@ function tshOnDamage(event) {
 
     // ---- Twilight Forest ice sword: Frosty II for 10 s unless freeze-immune / creative player ----
     if (m.tf_ice_chill === true && target.canFreeze() && !(target.isPlayer() && target.creative)) {
-        target.potionEffects.add("twilightforest:frosty", 200, 2)
+        target.potionEffects.add("twilightforest:frosted", 200, 2)
     }
 
     // ---- Gravitite sword (Aether): grounded or swimming target is launched; vanilla knockback runs after this event
