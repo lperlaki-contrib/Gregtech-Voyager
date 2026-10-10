@@ -7,13 +7,18 @@
 //
 // Table fields: t = Tinkers tier, s = sortOrder, c = craftable, col = main colour RRGGBB, fb = render fallbacks,
 // st = supported-stats profile (kmatStatProfiles), pal = optional hand-picked 7-stop palette (ARGB hex) overriding
-// the generated one, r = [[item or "#tag", needed], ...] material recipes (value is always 1; they only allow repair
+// the generated one, spr = texture the parts are filled with (kubejs/assets/kubejs/textures/<spr>.png), r = [[item or "#tag", needed], ...] material recipes (value is always 1; they only allow repair
 // and repair kits - part-builder access still depends on c = craftable).
 // Names are prefixed kmat/KUBEJS_ to avoid clashes with feat/tinkers-all-tools' global helpers (renderInfo, shade).
 // Rhino: no spread/destructuring, no const in loops.
 
+// shared palettes (7 stops, ARGB): gold sampled from vanilla golden tools (Tinkers' gold has no tool-head sprites, so our
+// golden tool heads are generated from this; Tinkers' own pre-made gold armor sprites are kept) and a bright neutral white
+global.KMAT_GOLD_PALETTE = ["FF000000", "FF6E4A10", "FFA06A12", "FFD99413", "FFE6AF15", "FFF2E04A", "FFFAFC75"]
+var KMAT_WHITE = ["FF000000", "FF6A6A70", "FF9C9CA3", "FFC6C6CC", "FFE2E2E6", "FFF4F4F6", "FFFFFFFF"]
+
 global.KUBEJS_MATERIALS = {
-    aether_candy_cane: { t: 0, s: 40, c: false, col: "FF6B81", fb: ["metal"], st: "tool5" },
+    aether_candy_cane: { t: 0, s: 40, c: false, col: "FF6B81", fb: ["metal"], st: "tool5", spr: "kubejs:generator/candy_stripes", r: [["aether:candy_cane", 1]] }, // repaired with candy canes (Aether: candy_cane_repairing)
     aether_flaming: { t: 3, s: 41, c: false, col: "FF7A1A", fb: ["metal"], st: "tool5" },
     aether_hammer_of_kingbdogz: { t: 2, s: 46, c: false, col: "8A6A40", fb: ["metal"], st: "tool5" },
     aether_holy: { t: 3, s: 42, c: false, col: "F5E7A1", fb: ["metal"], st: "tool5" },
@@ -27,7 +32,7 @@ global.KUBEJS_MATERIALS = {
     dragonbone_lightning: { t: 3, s: 35, c: false, col: "9A6BF3", fb: ["bone", "rock"], st: "tool6" },
     dragonsteel_lightning: { t: 4, s: 38, c: false, col: "8A5CF5", fb: ["metal"], st: "tool6" },
     fluix: { t: 2, s: 31, c: true, col: "8F6BD0", fb: ["metal"], st: "tool6", r: [["ae2:fluix_crystal", 1]] },
-    gold: { t: 0, s: 41, c: false, col: "FDF55F", fb: ["metal"], st: "tool5", tex: "tconstruct:gold", pal: ["FF000000", "FF752802", "FFB26411", "FFE9B115", "FFFAD64A", "FFFDF55F", "FFFFFDE0"], r: [["#forge:ingots/gold", 1], ["#forge:nuggets/gold", 9]] },
+    gold: { t: 0, s: 41, c: false, col: "FDF55F", fb: ["metal"], st: "tool5", pal: global.KMAT_GOLD_PALETTE, r: [["#forge:ingots/gold", 1], ["#forge:nuggets/gold", 9]] },
     gravitite: { t: 3, s: 23, c: true, col: "E07AE0", fb: ["metal"], st: "tool6", r: [["aether:enchanted_gravitite", 1]] },
     holystone: { t: 1, s: 21, c: true, col: "B5B9B2", fb: ["rock"], st: "tool4", r: [["aether:holystone", 1]] },
     iaf_amphithere: { t: 2, s: 53, c: false, col: "5FA05F", fb: ["metal"], st: "tool5" },
@@ -42,22 +47,22 @@ global.KUBEJS_MATERIALS = {
     myrmex_jungle_chitin: { t: 3, s: 37, c: true, col: "4AA65A", fb: ["bone", "rock"], st: "tool6", r: [["iceandfire:myrmex_jungle_chitin", 1]] },
     na_depth: { t: 4, s: 61, c: true, col: "5B3B86", fb: ["metal"], st: "tool5", r: [["naturesaura:depth_ingot", 1]] },
     na_infused_iron: { t: 2, s: 59, c: true, col: "6FCF9F", fb: ["metal"], st: "tool5", r: [["naturesaura:infused_iron", 1]] },
-    na_sky: { t: 3, s: 60, c: true, col: "8EC5FF", fb: ["metal"], st: "tool5", r: [["naturesaura:sky_ingot", 1]] },
+    na_sky: { t: 3, s: 60, c: true, col: "33DDF5", fb: ["metal"], st: "tool5", r: [["naturesaura:sky_ingot", 1]] },
     skyroot: { t: 0, s: 20, c: true, col: "C9B06B", fb: ["wood", "stick", "primitive"], st: "wood8", pal: ["FF000000", "FF241F13", "FF423A23", "FF645835", "FF887748", "FFA89359", "FFC9B06B"], r: [["aether:skyroot_planks", 1], ["aether:skyroot_stick", 2]] },
     tf_giant: { t: 1, s: 47, c: false, col: "8C8C8C", fb: ["metal"], st: "tool5" },
     tf_glass: { t: 0, s: 48, c: false, col: "DDEEFF", fb: ["metal"], st: "tool5" },
     tf_ice: { t: 0, s: 49, c: false, col: "AEE6FF", fb: ["metal"], st: "tool5" },
     tf_mazebreaker: { t: 3, s: 50, c: false, col: "C8B27A", fb: ["metal"], st: "tool5" },
-    valkyrie: { t: 3, s: 39, c: false, col: "E8E4F0", fb: ["metal"], st: "tool5" },
+    valkyrie: { t: 3, s: 39, c: false, col: "E8E4F0", fb: ["metal"], st: "tool5", pal: KMAT_WHITE },
     zanite: { t: 2, s: 22, c: true, col: "7A5CD6", fb: ["metal"], st: "tool6", r: [["aether:zanite_gemstone", 1]] },
     // ---- armor-only materials (feat/tinkers-armor): plating/maille stats + traits in data/kubejs/tinkering/materials ----
     aether_neptune: { t: 2, s: 70, c: false, col: "4FA3E8", fb: ["metal"], st: "tool5" },
-    aether_phoenix: { t: 3, s: 71, c: false, col: "F0701A", fb: ["metal"], st: "tool5" },
+    aether_phoenix: { t: 3, s: 71, c: false, col: "FF8A1F", fb: ["metal"], st: "tool5" },
     aether_obsidian: { t: 3, s: 72, c: false, col: "2A1F3D", fb: ["metal"], st: "tool5" },
     aether_sentry: { t: 1, s: 73, c: false, col: "A8A8B0", fb: ["metal"], st: "tool5" },
     tf_naga: { t: 1, s: 74, c: false, col: "4C9A3C", fb: ["metal"], st: "tool5" },
-    tf_yeti: { t: 3, s: 75, c: false, col: "CFE8F5", fb: ["metal"], st: "tool5" },
-    tf_arctic: { t: 2, s: 76, c: false, col: "DDE9F0", fb: ["metal"], st: "tool5" },
+    tf_yeti: { t: 3, s: 75, c: false, col: "CFE8F5", fb: ["metal"], st: "tool5", pal: KMAT_WHITE },
+    tf_arctic: { t: 2, s: 76, c: false, col: "DDE9F0", fb: ["metal"], st: "tool5", pal: KMAT_WHITE },
     tf_phantom: { t: 2, s: 77, c: false, col: "B8C4D8", fb: ["metal"], st: "tool5" },
     iaf_dragon_scale: { t: 2, s: 78, c: false, col: "C0392B", fb: ["metal"], st: "tool5" },
     iaf_tide: { t: 3, s: 79, c: false, col: "2BB3A4", fb: ["metal"], st: "tool5" },
@@ -103,16 +108,16 @@ function kmatRenderInfo(e) {
     var prof = kmatStatProfiles[e.st]
     for (var j = 0; j < prof.length; j++) stats.push("tconstruct:" + prof[j])
     for (var a = 0; a < kmatArmorStats.length; a++) stats.push("tconstruct:" + kmatArmorStats[a])
+    // spr: fill the parts with a texture instead of recolouring (Tinkers' grey_to_sprite, like its ice material); dark greys
+    // stay shaded by tinting the texture
+    var transformer = e.spr
+        ? { type: "tconstruct:grey_to_sprite", palette: [{ grey: 0, color: "FF000000" }, { grey: 63, path: e.spr, color: "FF6E6E6E" },
+            { grey: 140, path: e.spr, color: "FFB4B4B4" }, { grey: 216, path: e.spr }] }
+        : { type: "tconstruct:recolor_sprite", color_mapping: { type: "tconstruct:grey_to_color", palette: palette } }
     var info = {
         color: "FF" + e.col,
         fallbacks: e.fb,
-        generator: {
-            supported_stats: stats,
-            transformer: {
-                type: "tconstruct:recolor_sprite",
-                color_mapping: { type: "tconstruct:grey_to_color", palette: palette }
-            }
-        }
+        generator: { supported_stats: stats, transformer: transformer }
     }
     // tex: reuse another material's pre-generated sprites where they exist (e.g. kubejs:gold -> tconstruct:gold repair kit)
     if (e.tex) info.texture = e.tex

@@ -29,6 +29,7 @@
         "level": 1,
         "name": "kubejs:set_gravitite"
       }
-    ]
+    ],
+    "tconstruct:maille": []
   }
 }

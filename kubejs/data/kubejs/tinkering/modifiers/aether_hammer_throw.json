@@ -1,5 +1,12 @@
 {
   "level_display": "tconstruct:no_levels",
-  "modules": [],
+  "modules": [
+    {
+      "type": "tconstruct:stat_boost",
+      "each_level": 0.85,
+      "operation": "add",
+      "stat": "tconstruct:attack_speed"
+    }
+  ],
   "tooltip_display": "always"
 }

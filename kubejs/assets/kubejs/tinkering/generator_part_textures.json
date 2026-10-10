@@ -35,10 +35,6 @@
     {
       "path": "kubejs:item/tool/shovel/handle",
       "stat_type": "tconstruct:handle"
-    },
-    {
-      "path": "kubejs:item/tool/shovel/binding",
-      "stat_type": "tconstruct:binding"
     }
   ],
   "replace": false

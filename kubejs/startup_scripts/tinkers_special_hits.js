@@ -31,6 +31,13 @@ function tshIaf() {
     }
 }
 
+// Drops an item at the entity. Not spawnAtLocation: its ItemStack/ItemLike overloads are ambiguous for Rhino (throws).
+var TSH_ItemEntity = Java.loadClass("net.minecraft.world.entity.item.ItemEntity")
+function tshDrop(target, id) {
+    var level = target.level
+    level.addFreshEntity(new TSH_ItemEntity(level, target.x, target.y + 0.5, target.z, Item.of(id)))
+}
+
 var tshSweeping = false // re-entry guard for the hippogryph / soulstrider sweeps
 
 // Object mapping every kubejs:* modifier id of the stack (without namespace) to true, or null if there is none
@@ -54,8 +61,22 @@ function tshIsSword(stack) { // Aether/IaF "swords"
     return stack.hasTag("tconstruct:modifiable/melee/sword") || stack.id == "tconstruct:dagger"
 }
 
-function tshFull(e) { // EquipmentUtil.isFullStrength
-    return !e.isPlayer() || e.getAttackStrengthScale(1.0) >= 1.0
+// EquipmentUtil.isFullStrength. Tinkers' melee (ToolAttackUtil) resets the attack strength ticker BEFORE dealing damage, so
+// during LivingDamageEvent a Tinkers hit always reads ~0: the strength is recorded when the swing starts (AttackEntityEvent
+// fires before Tinkers' onLeftClickEntity) and read from there.
+// Server side only (the event also fires on the client, where a script error crashes the game), never throws.
+var TSH_swingStrength = new (Java.loadClass("java.util.WeakHashMap"))() // player -> attack strength at the start of the last swing
+ForgeEvents.onEvent("net.minecraftforge.event.entity.player.AttackEntityEvent", function (event) {
+    try {
+        var p = event.entity
+        if (p.level.clientSide) return
+        TSH_swingStrength.put(p, p.getAttackStrengthScale(0.5))
+    } catch (e) {}
+})
+function tshFull(e) {
+    if (!e.isPlayer()) return true
+    var s = TSH_swingStrength.get(e)
+    return (s == null ? e.getAttackStrengthScale(0.5) : s) > 0.9 // vanilla's "full swing" threshold (crits, sweeps)
 }
 
 // Shared with server_scripts/tinkers_special/abilities.js (startup globals are readable from server scripts)
@@ -81,12 +102,21 @@ function tshStrike(target, attacker) {
     if (TSH_IafEvents == null || (attacker.isPlayer() && attacker.attackAnim > 0.2)) return
     var bolt = target.level.createEntity("minecraft:lightning_bolt")
     bolt.addTag(TSH_IafEvents.BOLT_DONT_DESTROY_LOOT)
-    bolt.addTag(attacker.getStringUUID())
+    bolt.addTag(String(attacker.stringUUID)) // property form: the getStringUUID() call does not resolve in startup scripts
     bolt.moveTo(target.position())
     bolt.spawn()
 }
 
+// The handler never throws: an exception inside LivingDamageEvent cancels the hit's damage (seen in playtest: a failing
+// candy cane drop made every other full-strength hit deal nothing).
 ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingDamageEvent", function (event) {
+    try {
+        tshOnDamage(event)
+    } catch (e) {
+        console.error("[tinkers special hits] " + e)
+    }
+})
+function tshOnDamage(event) {
     if (tshSweeping) return
     var src = event.source
     var attacker = src.actual
@@ -103,7 +133,7 @@ ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingDamageEvent", 
     if (tshFull(attacker)) {
         // CandyCaneSwordItem.hurtEnemy: target not a player, nextBoolean() -> candy cane
         if (m.aether_candy_cane_drops === true && tt != "minecraft:player" && level.random.nextBoolean()) {
-            target.spawnAtLocation(Item.of("aether:candy_cane"))
+            tshDrop(target, "aether:candy_cane")
         }
         // FlamingSwordItem.onLivingDamage: 30 s of fire + 4 s per Fire Aspect level
         if (m.aether_flaming_blade === true) {
@@ -221,7 +251,7 @@ ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingDamageEvent", 
     // ---- Holystone sword: 1/25 ambrosium shard at the target (players excluded) ----
     if (m.holystone_blessing === true && tshIsSword(tool) && tshFull(attacker) && !target.isPlayer()
         && level.random.nextInt(25) == 0) {
-        target.spawnAtLocation(Item.of("aether:ambrosium_shard"))
+        tshDrop(target, "aether:ambrosium_shard")
     }
 
     // ---- Nature's Aura blades (ItemSword.hurtEnemy): botanist Slowness III 3 s, skyseeker Levitation III 3 s,
@@ -250,4 +280,4 @@ ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingDamageEvent", 
             attacker.sweepAttack()
         }
     }
-})
+}

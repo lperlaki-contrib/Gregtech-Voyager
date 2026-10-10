@@ -1,15 +1,15 @@
 {
   "icon": {
     "item": "kubejs:shovel",
-    "nbt": "{Damage:0,tic_broken:0b,tic_display:1b,tic_materials:[\"tconstruct:ui_render#head\",\"tconstruct:ui_render#handle\",\"tconstruct:ui_render#extra\",\"tconstruct:ui_render#large\",\"tconstruct:ui_render#extra_large\"]}"
+    "nbt": "{Damage:0,tic_broken:0b,tic_display:1b,tic_materials:[\"tconstruct:ui_render#head\",\"tconstruct:ui_render#handle\"]}"
   },
   "input_slots": [
     {
       "filter": {
-        "item": "tconstruct:large_plate"
+        "item": "tconstruct:adze_head"
       },
-      "icon": "tconstruct:large_plate",
-      "translation_key": "item.tconstruct.large_plate",
+      "icon": "tconstruct:adze_head",
+      "translation_key": "item.tconstruct.adze_head",
       "x": 45,
       "y": 26
     },
@@ -21,15 +21,6 @@
       "translation_key": "item.tconstruct.tool_handle",
       "x": 25,
       "y": 46
-    },
-    {
-      "filter": {
-        "item": "tconstruct:tool_binding"
-      },
-      "icon": "tconstruct:tool_binding",
-      "translation_key": "item.tconstruct.tool_binding",
-      "x": 25,
-      "y": 26
     }
   ],
   "sortIndex": 23,

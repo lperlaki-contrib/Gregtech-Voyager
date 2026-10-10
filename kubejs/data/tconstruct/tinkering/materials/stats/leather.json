@@ -1,0 +1,14 @@
+{
+  "stats": {
+    "tconstruct:binding": {},
+    "tconstruct:bowstring": {},
+    "tconstruct:cuirass": {},
+    "tconstruct:maille": {},
+    "tconstruct:repair_kit": {},
+    "tconstruct:skull": { "armor": 2, "durability": 150 },
+    "tconstruct:plating_helmet": { "armor": 1.0, "durability": 55 },
+    "tconstruct:plating_chestplate": { "armor": 3.0, "durability": 80 },
+    "tconstruct:plating_leggings": { "armor": 2.0, "durability": 75 },
+    "tconstruct:plating_boots": { "armor": 1.0, "durability": 65 }
+  }
+}

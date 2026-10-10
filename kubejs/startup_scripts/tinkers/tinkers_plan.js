@@ -34,8 +34,8 @@ global.tinkersConfig = () => {
 // ---- one-line switches ------------------------------------------------------------------------------------------
 // Butcher knife target: [tool id, part slots]. feat/tinkers-knives adds kubejs:butcher_knife; switch it here.
 global.TINKERS_BUTCHER_KNIFE = ["kubejs:butcher_knife", "hw"] // small_blade, tool_handle (feat/tinkers-knives)
-// Shovel target: [tool id, part slots]. kubejs:shovel (feat/tinkers-knives) = large_plate, tool_handle, tool_binding. Mattock is no longer a shovel.
-global.TINKERS_SHOVEL = ["kubejs:shovel", "hwh"]
+// Shovel target: [tool id, part slots]. kubejs:shovel (feat/tinkers-knives) = adze_head, tool_handle. Mattock is no longer a shovel.
+global.TINKERS_SHOVEL = ["kubejs:shovel", "hw"]
 // Tools made from kubejs: materials (Aether skyroot/holystone/zanite/gravitite, AE2 certus_quartz/fluix, IaF dragonbone,
 // myrmex chitin), defined on branch feat/tinkers-aether-materials (and followers).
 // Set to false if those are not merged (the tools are then left alone).
@@ -70,15 +70,15 @@ const TINKERS_SPECS = {
     crowbar: ["gregic_tinkering:crowbar", "hhh"], // crowbar_head, handle, crowbar_head
     plunger: ["gregic_tinkering:plunger", "hwh"],
     mallet: ["gregic_tinkering:soft_mallet", "hwh"], // soft_mallet_head, tool_handle, tool_binding
-    // armor: p = plating (the armor material), m = maille (neutral default ARMOR_MAILLE), r/l = fixed rose_gold plating / leather cuirass
+    // armor: p = plating (the armor material), m = maille (neutral default ARMOR_MAILLE), l = leather cuirass (travelers: leather plating too)
     plate_helmet: ["tconstruct:plate_helmet", "pm"],
     plate_chestplate: ["tconstruct:plate_chestplate", "pm"],
     plate_leggings: ["tconstruct:plate_leggings", "pm"],
     plate_boots: ["tconstruct:plate_boots", "pm"],
-    travelers_helmet: ["tconstruct:travelers_helmet", "rl"],
-    travelers_chestplate: ["tconstruct:travelers_chestplate", "rl"],
-    travelers_leggings: ["tconstruct:travelers_leggings", "rl"],
-    travelers_boots: ["tconstruct:travelers_boots", "rl"]
+    travelers_helmet: ["tconstruct:travelers_helmet", "pl"],
+    travelers_chestplate: ["tconstruct:travelers_chestplate", "pl"],
+    travelers_leggings: ["tconstruct:travelers_leggings", "pl"],
+    travelers_boots: ["tconstruct:travelers_boots", "pl"]
 }
 // GT electric tools -> gregic powered tools: [head, casing, engine, battery]
 const TINKERS_POWERED = {
@@ -142,6 +142,7 @@ const ONLY_NS = {
 // namespaces never converted (special abilities / not plain tools); reason is logged
 const SKIP_NS = {
     botania: "mana tools (self-repair, terra blade, ...)",
+    bloodmagic: "sentient tools (demon will drops need its own weapon class, will-scaled powers)",
     forbidden_arcanus: "draco arcanus / deorum special tools",
     occultism: "ritual tools (iesnium/infused pickaxe)",
     ars_nouveau: "spell sword",
@@ -181,7 +182,7 @@ addSpecial("sword", "kubejs:aether_holy", SKY, ["aether:holy_sword"])
 addSpecial("sword", "kubejs:aether_lightning", SKY, ["aether:lightning_sword"])
 addSpecial("sword", "kubejs:aether_vampire", SKY, ["aether:vampire_blade"])
 addSpecial("sword", "kubejs:aether_pig_slayer", SKY, ["aether:pig_slayer"])
-addSpecial("sword", "kubejs:aether_hammer_of_kingbdogz", SKY, ["aether:hammer_of_kingbdogz"])
+addSpecial("mining_hammer", "kubejs:aether_hammer_of_kingbdogz", SKY, ["aether:hammer_of_kingbdogz"]) // Aether: 6 attack, 1.6 speed, 250 durability
 addSpecial("pickaxe", "kubejs:tf_giant", WOOD, ["twilightforest:giant_pickaxe"])
 addSpecial("cleaver", "kubejs:tf_giant", WOOD, ["twilightforest:giant_sword"])
 addSpecial("sword", "kubejs:tf_glass", WOOD, ["twilightforest:glass_sword"])
@@ -259,9 +260,7 @@ global.TINKERS_LOOT_SOURCES = [
 // Tools used as ingredients in kubejs scripts (swapping them would make those recipes uncraftable)
 const TINKERS_KEEP = [
     "gtceu:tungsten_steel_sword", // voyagercore/helpersandmodules.js
-    "gtceu:iron_wrench", // gregify/backpacks.js
-    "minecraft:leather_helmet", // ars enchanting apparatus reagent (recipes/gregify/ars/vinery.js)
-    "minecraft:leather_chestplate" // helper hull recipe (recipes/voyagercore/helpersandmodules.js)
+    "gtceu:iron_wrench" // gregify/backpacks.js
 ]
 // Butcher knives and cleavers -> global.TINKERS_BUTCHER_KNIFE (head material per tier, like tinkers_loot.js)
 const BUTCHER_STAND_IN = ["hearthandharvest:diamond_cleaver", "hearthandharvest:netherite_cleaver"]
@@ -412,6 +411,9 @@ const toolType = (item) => {
 // (its only trait, Tanned, is irrelevant on armor; iron would add Magnetic, gold/silver add armor traits).
 const TT_ArmorItem = Java.loadClass("net.minecraft.world.item.ArmorItem")
 const ARMOR_MAILLE = "tconstruct:leather"
+// our (kubejs:) armor materials use themselves as maille for a consistent look (their maille traits are empty, see
+// data/kubejs/tinkering/materials/traits); exceptions: a secondary material
+const ARMOR_MAILLE_FOR = { "kubejs:valkyrie": "tconstruct:gold" }
 const ARMOR_SLOT = { head: "helmet", chest: "chestplate", legs: "leggings", feet: "boots" }
 const ARMOR_NS = { minecraft: true, aether: true, twilightforest: true, iceandfire: true }
 const AETHER_ARMOR = {
@@ -453,7 +455,9 @@ const armorPlan = (id, ns, item) => {
     let m = null
     let standIn = false
     if (ns == "minecraft") {
-        if (mname == "leather") return { type: "travelers_" + slot, mat: "tconstruct:rose_gold", armor: true, src: "armor" }
+        if (mname == "leather") return { type: "travelers_" + slot, mat: "tconstruct:leather", armor: true, src: "armor" } // plating stats: data/tconstruct/.../stats/leather.json
+        // chainmail: iron travelers gear (iron plating x0.75 + leather cuirass ~ chainmail's 2/5/4/1 armor)
+        if (mname == "chainmail") return { type: "travelers_" + slot, mat: "tconstruct:iron", armor: true, src: "armor" }
         if (mname == "iron") m = "tconstruct:iron"
         else if (mname == "gold") m = "tconstruct:gold" // exact: Tinkers gold plating (golden trait = piglin neutral)
         else if (mname == "diamond") {
@@ -675,8 +679,7 @@ global.tinkersPartsFor = (id) => {
     const handle = p.handle || HANDLE_BY_NS(String(id))
     const mats = slots.split("").map((s) => {
         if (s == "h" || s == "p") return p.mat
-        if (s == "m") return ARMOR_MAILLE
-        if (s == "r") return "tconstruct:rose_gold"
+        if (s == "m") return ARMOR_MAILLE_FOR[p.mat] || (p.mat.indexOf("kubejs:") == 0 ? p.mat : ARMOR_MAILLE)
         if (s == "l") return "tconstruct:leather"
         if (s == "c") return "tconstruct:steel"
         if (s == "e") return "gregic_tinkering:" + p.volt + "_electric"

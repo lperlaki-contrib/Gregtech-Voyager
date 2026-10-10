@@ -20,9 +20,9 @@ var TR_JsonArray = Java.loadClass("com.google.gson.JsonArray")
 var TR_ITEM_P = Java.loadClass("java.util.regex.Pattern").compile('"item"\\s*:\\s*"(?<id>[^"]+)"') // named group: Rhino passes group(1) as 1.0 -> group(String)
 // recipe types whose tool inputs are left alone: cooking/melting/recycling the original, Tinkers' own, GT machines (not crafting)
 var TR_ToolStack = Java.loadClass("slimeknights.tconstruct.library.tools.nbt.ToolStack")
-var TR_StringTag = Java.loadClass("net.minecraft.nbt.StringTag")
-// upgrade recipes: [original recipe id, original input tool, original output tool, other ingredients]. All shapeless; AE2's
-// smithing (template + quartz tool + fluix block) becomes shapeless too: smithing copies the base's NBT and can't swap a part.
+var TR_MaterialVariantId = Java.loadClass("slimeknights.tconstruct.library.materials.definition.MaterialVariantId")
+// upgrade recipes: [original recipe id, original input tool, original output tool, other ingredients, smithing]. Shapeless, or
+// smithing ([template, addition]): vanilla smithing copies the base's NBT, so tcon/smithing_upgrade.js fixes the result slot.
 var TR_FIERY = "#twilightforest:fiery_vial"
 var TR_UPGRADES = [
     ["twilightforest:equipment/fiery_iron_pickaxe", "minecraft:iron_pickaxe", "twilightforest:fiery_pickaxe", [TR_FIERY, TR_FIERY, TR_FIERY, "#forge:rods/blaze", "#forge:rods/blaze"]],
@@ -33,7 +33,21 @@ var TR_UPGRADES = [
     ["twilightforest:equipment/fiery_fiery_boots", "minecraft:iron_boots", "twilightforest:fiery_boots", [TR_FIERY, TR_FIERY, TR_FIERY, TR_FIERY]],
     ["iceandfire:ghost_sword", "iceandfire:dragonbone_sword", "iceandfire:ghost_sword", ["iceandfire:ghost_ingot"]]
 ]
-;["pickaxe", "axe", "shovel", "hoe", "sword"].forEach((k) => TR_UPGRADES.push(["ae2:tools/fluix_" + k, "ae2:certus_quartz_" + k, "ae2:fluix_" + k, ["ae2:fluix_upgrade_smithing_template", "ae2:fluix_block"]]))
+;["pickaxe", "axe", "shovel", "hoe", "sword"].forEach((k) => TR_UPGRADES.push(["ae2:tools/fluix_" + k, "ae2:certus_quartz_" + k, "ae2:fluix_" + k, ["ae2:fluix_upgrade_smithing_template", "ae2:fluix_block"], true]))
+// the upgraded tool: parts of fromMat switched to the target composition's material in that slot (modifiers, name etc. kept)
+global.tinkersUpgradeStack = (stack, fromMat, toMats) => {
+    // Tinkers API, not raw NBT: copyFrom keeps every other tag (modifiers, name, affixes), replaceMaterial is the part swap
+    let tool = TR_ToolStack.copyFrom(stack)
+    let mats = tool.getMaterials()
+    for (let i = 0; i < mats.size() && i < toMats.length; i++) {
+        if (String(mats.get(i).getVariant()) == fromMat) tool.replaceMaterial(i, TR_MaterialVariantId.parse(String(toMats[i])))
+    }
+    tool.rebuildStats()
+    return tool.createStack()
+}
+// tags that only held converted tools (empty after tcon/replaced_tool_tags.js) -> the plan id whose "any Tinkers tool" input replaces them
+// (found by /kubejs custom_command tinkers_input_check, EMPTY INPUT lines)
+var TR_TAG_INPUTS = { "forge:tools/metal/axes": "minecraft:iron_axe" }
 var TR_SKIP_TYPE = /^(tconstruct:|minecraft:(smelting|blasting|smoking|campfire_cooking)$)|melting|recycl|salvag|repair|^gtceu:(?!.*crafting)/
 ServerEvents.recipes((event) => {
     global.tinkersEnsurePlan() // plan may not be built yet (startup order)
@@ -125,26 +139,26 @@ ServerEvents.recipes((event) => {
         }
         return inputCache[id]
     }
-    // replace every {"item": id} object outside the result keys (schema-less recipe types: KubeJS replaceInput can't see them)
-    function replaceInJson(node, id, ingJson) {
+    // replace every {<key>: id} object ({"item": ...} or {"tag": ...}) outside the result keys (schema-less recipe types: KubeJS replaceInput can't see them)
+    function replaceInJson(node, id, ingJson, key) {
         let n = 0
         if (node instanceof TR_JsonArray) {
             for (let i = 0; i < node.size(); i++) {
                 let el = node.get(i)
-                if (el instanceof TR_JsonObject && el.has("item") && String(el.get("item").getAsString()) == id && !el.has("type")) {
+                if (el instanceof TR_JsonObject && el.has(key) && String(el.get(key).getAsString()) == id && !el.has("type")) {
                     node.set(i, ingJson.deepCopy())
                     n++
-                } else n += replaceInJson(el, id, ingJson)
+                } else n += replaceInJson(el, id, ingJson, key)
             }
         } else if (node instanceof TR_JsonObject) {
             node.keySet().toArray().forEach((k) => {
                 k = String(k)
                 if (OUTPUT_KEYS.indexOf(k) >= 0) return
                 let el = node.get(k)
-                if (el instanceof TR_JsonObject && el.has("item") && String(el.get("item").getAsString()) == id && !el.has("type")) {
+                if (el instanceof TR_JsonObject && el.has(key) && String(el.get(key).getAsString()) == id && !el.has("type")) {
                     node.add(k, ingJson.deepCopy())
                     n++
-                } else n += replaceInJson(el, id, ingJson)
+                } else n += replaceInJson(el, id, ingJson, key)
             })
         }
         return n
@@ -159,9 +173,26 @@ ServerEvents.recipes((event) => {
         if (TR_SKIP_TYPE.test(type)) return
         let ids = {}
         let found = false
-        let m = TR_ITEM_P.matcher(j.toString())
+        let js = j.toString()
+        let tagDone = []
+        let tagJson = false // edited only in the JSON: re-added as a custom recipe (a schema recipe would re-serialize its old inputs)
+        Object.keys(TR_TAG_INPUTS).forEach((t) => {
+            let rep = TR_TAG_INPUTS[t]
+            if (js.indexOf('"tag":"' + t + '"') < 0 || !plan[rep]) return
+            let done = false
+            try {
+                done = r.replaceInput("#" + t, inputFor(rep))
+            } catch (e) {}
+            if (!done) {
+                if (replaceInJson(j, t, inputFor(rep).toJson(), "tag") == 0) return
+                tagJson = true
+            }
+            tagDone.push(rep)
+            inputsReplaced++
+        })
+        let m = TR_ITEM_P.matcher(js)
         while (m.find() && !found) found = !!plan[String(m.group("id"))]
-        if (!found) return
+        if (!found && tagDone.length == 0) return
         // a plan id somewhere: rescan without the output keys, so a tool recipe's own result does not count as an input
         let probe = j.deepCopy()
         OUTPUT_KEYS.forEach((k) => probe.remove(k))
@@ -170,15 +201,15 @@ ServerEvents.recipes((event) => {
             let id = String(m.group("id"))
             if (plan[id] && (cfg.convertArmor || !plan[id].armor)) ids[id] = true
         }
-        let edited = false
-        let doneIds = []
+        let edited = tagDone.length > 0
+        let doneIds = tagDone
         Object.keys(ids).forEach((id) => {
             let ing = inputFor(id)
             let done = false
             try {
                 done = r.replaceInput(id, ing)
             } catch (e) {}
-            if (!done) done = replaceInJson(j, id, ing.toJson()) > 0
+            if (!done) done = replaceInJson(j, id, ing.toJson(), "item") > 0
             if (done) {
                 doneIds.push(id)
                 edited = true
@@ -186,15 +217,15 @@ ServerEvents.recipes((event) => {
             }
         })
         if (edited) {
+            let im = IMPOSTOR_RE.exec(type)
+            let copy = im || tagJson ? j.deepCopy() : null // before save(): a schema recipe may re-serialize its old inputs into the JSON
             r.save()
             inputRecipes.push(String(r.getId()))
             global.TINKERS_INPUT_RECIPES[String(r.getId())] = doneIds
             // ComputerCraft's impostor recipes (turtle + tool -> turtle with upgrade) never match: they only display the upgrade,
             // the real crafting accepts only the exact upgrade item. Re-add them as normal crafting recipes (same pattern/result).
-            let im = IMPOSTOR_RE.exec(type)
-            if (im) {
-                let copy = j.deepCopy()
-                copy.addProperty("type", "minecraft:crafting_" + im[1])
+            if (copy) {
+                if (im) copy.addProperty("type", "minecraft:crafting_" + im[1])
                 impostors.push([String(r.getId()), copy])
                 delete global.TINKERS_INPUT_RECIPES[String(r.getId())]
                 global.TINKERS_INPUT_RECIPES["kubejs:tinkers_input/" + String(r.getId()).replace(":", "/")] = doneIds
@@ -292,6 +323,7 @@ ServerEvents.recipes((event) => {
     // the original's material, and the result is THAT tool with those parts switched to the upgraded material (modifiers kept).
     // Ingredient like inputFor: a named example + the plain tool, minus broken tools and tools without the material.
     let upgraded = 0
+    global.TINKERS_SMITHING_UPGRADES = {} // "template|tool" -> { from, to } (read by tcon/smithing_upgrade.js)
     TR_UPGRADES.forEach((u) => {
         let from = plan[u[1]]
         let to = plan[u[2]]
@@ -313,20 +345,16 @@ ServerEvents.recipes((event) => {
         let fromMat = from.mat
         let toMats = toParts.mats
         removeIds.push(u[0])
-        event.shapeless(global.tinkersStackFor(u[2]), [ing].concat(u[3]))
-            .id("kubejs:tinkers_upgrade/" + u[0].replace(":", "/"))
-            .modifyResult((grid, result) => {
+        let id = "kubejs:tinkers_upgrade/" + u[0].replace(":", "/")
+        if (u[4]) {
+            event.smithing(global.tinkersStackFor(u[2]), u[3][0], ing, u[3][1]).id(id)
+            global.TINKERS_SMITHING_UPGRADES[u[3][0] + "|" + tool] = { from: fromMat, to: toMats }
+        } else {
+            event.shapeless(global.tinkersStackFor(u[2]), [ing].concat(u[3])).id(id).modifyResult((grid, result) => {
                 let stack = grid.find(ing)
-                if (!stack || stack.isEmpty()) return result
-                let out = stack.copy()
-                let mats = out.nbt.getList("tic_materials", 8) // 8 = string tags
-                for (let i = 0; i < mats.size() && i < toMats.length; i++) {
-                    if (String(mats.getString(i)) == fromMat) mats.set(i, TR_StringTag.valueOf(toMats[i]))
-                }
-                TR_ToolStack.from(out).rebuildStats()
-                out.setCount(1)
-                return out
+                return !stack || stack.isEmpty() ? result : global.tinkersUpgradeStack(stack, fromMat, toMats)
             })
+        }
         upgraded++
     })
     console.info("[tinkers tools] " + upgraded + " upgrade recipes keep the input tool (parts of the old material -> new material)")
@@ -334,7 +362,7 @@ ServerEvents.recipes((event) => {
         removeIds.push(pair[0])
         event.custom(pair[1]).id("kubejs:tinkers_input/" + pair[0].replace(":", "/"))
     })
-    if (impostors.length > 0) console.info("[tinkers tools] " + impostors.length + " ComputerCraft upgrade recipes re-added as real crafting recipes")
+    if (impostors.length > 0) console.info("[tinkers tools] " + impostors.length + " recipes re-added with substituted inputs (ComputerCraft upgrades as real crafting, JSON-edited tag inputs)")
     // Removed, not swapped: stand-in tools (e.g. diamond pickaxe -> cobalt), golden tools (unless craftable), unmapped tools
     // (removeUnmappedToolRecipes), non-GT duplicates, ComputerCraft impostors (re-added above) and GT's dragonsteel armor.
     removeIds.forEach((id) => { delete global.TINKERS_INPUT_RECIPES[id] }) // removed on purpose (stand-ins, gold, impostors)

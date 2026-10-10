@@ -37,6 +37,7 @@
         "level": 1,
         "name": "kubejs:dragon_ward"
       }
-    ]
+    ],
+    "tconstruct:maille": []
   }
 }
