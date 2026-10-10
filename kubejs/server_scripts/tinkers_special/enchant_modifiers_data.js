@@ -5,6 +5,19 @@
 var TEM_ForgeRegistries = Java.loadClass("net.minecraftforge.registries.ForgeRegistries")
 var TEM_ResourceLocation = Java.loadClass("net.minecraft.resources.ResourceLocation")
 
+// first allowed-tools entry -> encyclopedia group (tconstruct:abilities/<group>, tconstruct:upgrades/<group>)
+var TEM_BOOK_GROUP = {
+    "#tconstruct:modifiable/melee": "melee",
+    "#tconstruct:modifiable/harvest": "harvest",
+    "#tconstruct:modifiable/harvest/stone": "harvest",
+    "tconstruct:hand_axe": "harvest",
+    "tconstruct:kama": "harvest",
+    "#tconstruct:modifiable/durability": "general",
+    "#tconstruct:modifiable/armor/chestplate": "armor/chestplate",
+    "#tconstruct:modifiable/armor/leggings": "armor/leggings",
+    "#tconstruct:modifiable/armor/boots": "armor/boots"
+}
+
 ServerEvents.highPriorityData(function (event) {
     var table = global.TINKERS_ENCH_MODIFIERS
     var map = {}
@@ -40,4 +53,17 @@ ServerEvents.highPriorityData(function (event) {
     })
     // Tinkers reads every pack's copy of this file and merges them, so this only adds our entries
     event.addJson("tconstruct:tinkering/enchantments_to_modifiers", map)
+    // Tinkers' encyclopedia lists every modifier in its section tags (abilities/upgrades x group) and builds a page from the
+    // modifier's lang when no page file exists; tags merge across packs
+    var tags = {}
+    Object.keys(map).forEach(function (ench) {
+        var e = table[ench]
+        if (e.m) return
+        var tag = (e.ab ? "abilities/" : "upgrades/") + (TEM_BOOK_GROUP[e.tl[0]] || "general")
+        if (!tags[tag]) tags[tag] = []
+        tags[tag].push(map[ench])
+    })
+    Object.keys(tags).forEach(function (tag) {
+        event.addJson("tconstruct:tinkering/tags/modifiers/" + tag, { replace: false, values: tags[tag] })
+    })
 })
