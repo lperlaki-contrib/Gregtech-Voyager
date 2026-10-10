@@ -70,15 +70,15 @@ const TINKERS_SPECS = {
     crowbar: ["gregic_tinkering:crowbar", "hhh"], // crowbar_head, handle, crowbar_head
     plunger: ["gregic_tinkering:plunger", "hwh"],
     mallet: ["gregic_tinkering:soft_mallet", "hwh"], // soft_mallet_head, tool_handle, tool_binding
-    // armor: p = plating (the armor material), m = maille (neutral default ARMOR_MAILLE), r/l = fixed rose_gold plating / leather cuirass
+    // armor: p = plating (the armor material), m = maille (neutral default ARMOR_MAILLE), l = leather cuirass (travelers: leather plating too)
     plate_helmet: ["tconstruct:plate_helmet", "pm"],
     plate_chestplate: ["tconstruct:plate_chestplate", "pm"],
     plate_leggings: ["tconstruct:plate_leggings", "pm"],
     plate_boots: ["tconstruct:plate_boots", "pm"],
-    travelers_helmet: ["tconstruct:travelers_helmet", "rl"],
-    travelers_chestplate: ["tconstruct:travelers_chestplate", "rl"],
-    travelers_leggings: ["tconstruct:travelers_leggings", "rl"],
-    travelers_boots: ["tconstruct:travelers_boots", "rl"]
+    travelers_helmet: ["tconstruct:travelers_helmet", "pl"],
+    travelers_chestplate: ["tconstruct:travelers_chestplate", "pl"],
+    travelers_leggings: ["tconstruct:travelers_leggings", "pl"],
+    travelers_boots: ["tconstruct:travelers_boots", "pl"]
 }
 // GT electric tools -> gregic powered tools: [head, casing, engine, battery]
 const TINKERS_POWERED = {
@@ -259,9 +259,7 @@ global.TINKERS_LOOT_SOURCES = [
 // Tools used as ingredients in kubejs scripts (swapping them would make those recipes uncraftable)
 const TINKERS_KEEP = [
     "gtceu:tungsten_steel_sword", // voyagercore/helpersandmodules.js
-    "gtceu:iron_wrench", // gregify/backpacks.js
-    "minecraft:leather_helmet", // ars enchanting apparatus reagent (recipes/gregify/ars/vinery.js)
-    "minecraft:leather_chestplate" // helper hull recipe (recipes/voyagercore/helpersandmodules.js)
+    "gtceu:iron_wrench" // gregify/backpacks.js
 ]
 // Butcher knives and cleavers -> global.TINKERS_BUTCHER_KNIFE (head material per tier, like tinkers_loot.js)
 const BUTCHER_STAND_IN = ["hearthandharvest:diamond_cleaver", "hearthandharvest:netherite_cleaver"]
@@ -453,7 +451,7 @@ const armorPlan = (id, ns, item) => {
     let m = null
     let standIn = false
     if (ns == "minecraft") {
-        if (mname == "leather") return { type: "travelers_" + slot, mat: "tconstruct:rose_gold", armor: true, src: "armor" }
+        if (mname == "leather") return { type: "travelers_" + slot, mat: "tconstruct:leather", armor: true, src: "armor" } // plating stats: data/tconstruct/.../stats/leather.json
         if (mname == "iron") m = "tconstruct:iron"
         else if (mname == "gold") m = "tconstruct:gold" // exact: Tinkers gold plating (golden trait = piglin neutral)
         else if (mname == "diamond") {
@@ -676,7 +674,6 @@ global.tinkersPartsFor = (id) => {
     const mats = slots.split("").map((s) => {
         if (s == "h" || s == "p") return p.mat
         if (s == "m") return ARMOR_MAILLE
-        if (s == "r") return "tconstruct:rose_gold"
         if (s == "l") return "tconstruct:leather"
         if (s == "c") return "tconstruct:steel"
         if (s == "e") return "gregic_tinkering:" + p.volt + "_electric"
