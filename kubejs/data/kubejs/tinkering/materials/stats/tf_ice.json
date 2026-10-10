@@ -17,6 +17,12 @@
       "accuracy": 0.0,
       "durability": 0.1,
       "melee_damage": 1.0
+    },
+    "tconstruct:limb": {
+      "accuracy": 0.0,
+      "draw_speed": 0.0,
+      "durability": 136,
+      "velocity": 0.0
     }
   }
 }

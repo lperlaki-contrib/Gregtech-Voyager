@@ -24,6 +24,12 @@
         "level": 1,
         "name": "kubejs:set_phoenix"
       }
+    ],
+    "tconstruct:limb": [
+      {
+        "level": 1,
+        "name": "kubejs:aether_phoenix_fire"
+      }
     ]
   }
 }

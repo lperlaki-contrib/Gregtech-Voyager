@@ -1,0 +1,11 @@
+{
+  "default": [],
+  "perStat": {
+    "tconstruct:limb": [
+      {
+        "level": 1,
+        "name": "kubejs:tf_triple_shot"
+      }
+    ]
+  }
+}
