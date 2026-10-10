@@ -21,6 +21,16 @@ var TAS_MobEffectInstance = Java.loadClass("net.minecraft.world.effect.MobEffect
 var TAS_MobEffects = Java.loadClass("net.minecraft.world.effect.MobEffects")
 var TAS_AttrModifier = Java.loadClass("net.minecraft.world.entity.ai.attributes.AttributeModifier")
 var TAS_Operation = Java.loadClass("net.minecraft.world.entity.ai.attributes.AttributeModifier$Operation")
+// Every handler is wrapped: an exception inside a Forge event (hurt, attack, fall, ...) would cancel or break the event.
+function tasSafe(fn) {
+    return function (event) {
+        try {
+            fn(event)
+        } catch (e) {
+            console.error("[tinkers armor sets] " + e)
+        }
+    }
+}
 var TAS_UUID = Java.loadClass("java.util.UUID")
 var TAS_ForgeMod = Java.loadClass("net.minecraftforge.common.ForgeMod")
 var TAS_NEPTUNE_ID = TAS_UUID.fromString("5f3c2c1e-7a0b-4c55-9a5e-2d8f6a1b0c01")
@@ -120,38 +130,38 @@ function tasRecompute(entity) {
     if (!!(f && f.tide > 0) != !!(prev && prev.tide > 0)) tasBreathing(entity, !!(f && f.tide > 0))
 }
 
-ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent", function (event) {
+ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent", tasSafe(function (event) {
     var sl = event.slot
     if (sl != TAS_Slot.HEAD && sl != TAS_Slot.CHEST && sl != TAS_Slot.LEGS && sl != TAS_Slot.FEET) return
     tasRecompute(event.entity)
-})
+}))
 try {
-    ForgeEvents.onEvent("top.theillusivec4.curios.api.event.CurioChangeEvent", function (event) {
+    ForgeEvents.onEvent("top.theillusivec4.curios.api.event.CurioChangeEvent", tasSafe(function (event) {
         tasRecompute(event.entity)
-    })
+    }))
 } catch (e) {
     console.info("[tinkers armor] Curios not present, Aether set gloves are not checked on curio changes")
 }
-ForgeEvents.onEvent("net.minecraftforge.event.entity.player.PlayerEvent$PlayerLoggedOutEvent", function (event) {
+ForgeEvents.onEvent("net.minecraftforge.event.entity.player.PlayerEvent$PlayerLoggedOutEvent", tasSafe(function (event) {
     var key = String(event.entity.stringUUID)
     if (TAS_FLAGS[key] !== undefined) {
         delete TAS_FLAGS[key]
         TAS_N--
     }
-})
+}))
 // Death creates a new entity (attribute modifiers and effects are gone, but with keepInventory the armor stays), so the cached flags
 // would make tasRecompute skip re-applying neptune/tide: forget them first, then recompute against the respawned entity.
-ForgeEvents.onEvent("net.minecraftforge.event.entity.player.PlayerEvent$PlayerRespawnEvent", function (event) {
+ForgeEvents.onEvent("net.minecraftforge.event.entity.player.PlayerEvent$PlayerRespawnEvent", tasSafe(function (event) {
     var key = String(event.entity.stringUUID)
     if (TAS_FLAGS[key] !== undefined) {
         delete TAS_FLAGS[key]
         TAS_N--
     }
     tasRecompute(event.entity)
-})
+}))
 
 // ---- hooks ---------------------------------------------------------------------------------------------------------------------
-ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingHurtEvent", function (event) {
+ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingHurtEvent", tasSafe(function (event) {
     if (TAS_N == 0) return
     var src = event.source
     var atk = src.actual
@@ -167,9 +177,9 @@ ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingHurtEvent", fu
         var fv = TAS_FLAGS[String(v.stringUUID)]
         if (fv !== undefined && fv.yeti > 0) atk.potionEffects.add("twilightforest:frosty", 5 * fv.yeti + 5, fv.yeti)
     }
-})
+}))
 
-ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingEvent$LivingJumpEvent", function (event) {
+ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingEvent$LivingJumpEvent", tasSafe(function (event) {
     if (TAS_N == 0) return
     var e = event.entity
     if (!e.isPlayer() || e.level.clientSide) return
@@ -177,17 +187,17 @@ ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingEvent$LivingJu
     if (f === undefined || !f.grav) return
     e.push(0, 1, 0) // GravititeArmor.boostedJump
     e.connection.send(new TAS_Packet(e))
-})
+}))
 
-ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingFallEvent", function (event) {
+ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingFallEvent", tasSafe(function (event) {
     if (TAS_N == 0) return
     var e = event.entity
     if (!e.isPlayer()) return
     var f = TAS_FLAGS[String(e.stringUUID)]
     if (f !== undefined && (f.grav || f.valk || f.sentry)) event.canceled = true // AbilityHooks.ArmorHooks.fallCancellation
-})
+}))
 
-ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingAttackEvent", function (event) {
+ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingAttackEvent", tasSafe(function (event) {
     if (TAS_N == 0) return
     var e = event.entity
     if (!e.isPlayer()) return
@@ -197,4 +207,4 @@ ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingAttackEvent", 
         event.canceled = true // PhoenixArmor.extinguishUser
         e.clearFire()
     }
-})
+}))
