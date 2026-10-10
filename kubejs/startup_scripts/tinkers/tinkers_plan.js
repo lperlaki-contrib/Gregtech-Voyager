@@ -456,6 +456,8 @@ const armorPlan = (id, ns, item) => {
     let standIn = false
     if (ns == "minecraft") {
         if (mname == "leather") return { type: "travelers_" + slot, mat: "tconstruct:leather", armor: true, src: "armor" } // plating stats: data/tconstruct/.../stats/leather.json
+        // chainmail: iron travelers gear (iron plating x0.75 + leather cuirass ~ chainmail's 2/5/4/1 armor)
+        if (mname == "chainmail") return { type: "travelers_" + slot, mat: "tconstruct:iron", armor: true, src: "armor" }
         if (mname == "iron") m = "tconstruct:iron"
         else if (mname == "gold") m = "tconstruct:gold" // exact: Tinkers gold plating (golden trait = piglin neutral)
         else if (mname == "diamond") {
