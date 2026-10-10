@@ -95,7 +95,7 @@ function tshStrike(target, attacker) {
     if (TSH_IafEvents == null || (attacker.isPlayer() && attacker.attackAnim > 0.2)) return
     var bolt = target.level.createEntity("minecraft:lightning_bolt")
     bolt.addTag(TSH_IafEvents.BOLT_DONT_DESTROY_LOOT)
-    bolt.addTag(attacker.getStringUUID())
+    bolt.addTag(String(attacker.stringUUID)) // property form: the getStringUUID() call does not resolve in startup scripts
     bolt.moveTo(target.position())
     bolt.spawn()
 }
