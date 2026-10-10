@@ -20,7 +20,7 @@ var TR_JsonArray = Java.loadClass("com.google.gson.JsonArray")
 var TR_ITEM_P = Java.loadClass("java.util.regex.Pattern").compile('"item"\\s*:\\s*"(?<id>[^"]+)"') // named group: Rhino passes group(1) as 1.0 -> group(String)
 // recipe types whose tool inputs are left alone: cooking/melting/recycling the original, Tinkers' own, GT machines (not crafting)
 var TR_ToolStack = Java.loadClass("slimeknights.tconstruct.library.tools.nbt.ToolStack")
-var TR_StringTag = Java.loadClass("net.minecraft.nbt.StringTag")
+var TR_MaterialVariantId = Java.loadClass("slimeknights.tconstruct.library.materials.definition.MaterialVariantId")
 // upgrade recipes: [original recipe id, original input tool, original output tool, other ingredients, smithing]. Shapeless, or
 // smithing ([template, addition]): vanilla smithing copies the base's NBT, so tcon/smithing_upgrade.js fixes the result slot.
 var TR_FIERY = "#twilightforest:fiery_vial"
@@ -36,14 +36,14 @@ var TR_UPGRADES = [
 ;["pickaxe", "axe", "shovel", "hoe", "sword"].forEach((k) => TR_UPGRADES.push(["ae2:tools/fluix_" + k, "ae2:certus_quartz_" + k, "ae2:fluix_" + k, ["ae2:fluix_upgrade_smithing_template", "ae2:fluix_block"], true]))
 // the upgraded tool: parts of fromMat switched to the target composition's material in that slot (modifiers, name etc. kept)
 global.tinkersUpgradeStack = (stack, fromMat, toMats) => {
-    let out = stack.copy()
-    let mats = out.nbt.getList("tic_materials", 8) // 8 = string tags
+    // Tinkers API, not raw NBT: copyFrom keeps every other tag (modifiers, name, affixes), replaceMaterial is the part swap
+    let tool = TR_ToolStack.copyFrom(stack)
+    let mats = tool.getMaterials()
     for (let i = 0; i < mats.size() && i < toMats.length; i++) {
-        if (String(mats.getString(i)) == fromMat) mats.set(i, TR_StringTag.valueOf(toMats[i]))
+        if (String(mats.get(i).getVariant()) == fromMat) tool.replaceMaterial(i, TR_MaterialVariantId.parse(String(toMats[i])))
     }
-    TR_ToolStack.from(out).rebuildStats()
-    out.setCount(1)
-    return out
+    tool.rebuildStats()
+    return tool.createStack()
 }
 // tags that only held converted tools (empty after tcon/replaced_tool_tags.js) -> the plan id whose "any Tinkers tool" input replaces them
 // (found by /kubejs custom_command tinkers_input_check, EMPTY INPUT lines)
