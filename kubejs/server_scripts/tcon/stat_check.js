@@ -235,7 +235,7 @@ ServerEvents.customCommand("tinkers_test_chests", (event) => {
             let tool = SC_ToolStack.from(stack)
             tool.addModifier(SC_ModifierId.tryParse(global.temModifierId(ench)), e.max || 1)
             tool.rebuildStats()
-            stack.setHoverName(Text.of(global.temModifierId(ench)).gold())
+            stack.setHoverName(Text.translate("modifier." + global.temModifierId(ench).replace(":", ".")).gold()) // modifier name
             enchanted.push([stack, global.tinkersStackFor(baseId)])
         } catch (err) {
             console.warn("[tinkers test chests] " + ench + ": " + err) // modifier missing (enchantment not registered)
