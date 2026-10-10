@@ -5,10 +5,25 @@
     "tconstruct:cuirass": {},
     "tconstruct:maille": {},
     "tconstruct:repair_kit": {},
-    "tconstruct:skull": { "armor": 2, "durability": 150 },
-    "tconstruct:plating_helmet": { "armor": 1.0, "durability": 55 },
-    "tconstruct:plating_chestplate": { "armor": 3.0, "durability": 80 },
-    "tconstruct:plating_leggings": { "armor": 2.0, "durability": 75 },
-    "tconstruct:plating_boots": { "armor": 1.0, "durability": 65 }
+    "tconstruct:skull": {
+      "armor": 2,
+      "durability": 150
+    },
+    "tconstruct:plating_helmet": {
+      "armor": 1.33,
+      "durability": 98
+    },
+    "tconstruct:plating_chestplate": {
+      "armor": 4.0,
+      "durability": 142
+    },
+    "tconstruct:plating_leggings": {
+      "armor": 2.67,
+      "durability": 133
+    },
+    "tconstruct:plating_boots": {
+      "armor": 1.33,
+      "durability": 116
+    }
   }
 }
