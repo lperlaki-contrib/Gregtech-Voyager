@@ -42,7 +42,7 @@ global.KUBEJS_MATERIALS = {
     myrmex_jungle_chitin: { t: 3, s: 37, c: true, col: "4AA65A", fb: ["bone", "rock"], st: "tool6", r: [["iceandfire:myrmex_jungle_chitin", 1]] },
     na_depth: { t: 4, s: 61, c: true, col: "5B3B86", fb: ["metal"], st: "tool5", r: [["naturesaura:depth_ingot", 1]] },
     na_infused_iron: { t: 2, s: 59, c: true, col: "6FCF9F", fb: ["metal"], st: "tool5", r: [["naturesaura:infused_iron", 1]] },
-    na_sky: { t: 3, s: 60, c: true, col: "8EC5FF", fb: ["metal"], st: "tool5", r: [["naturesaura:sky_ingot", 1]] },
+    na_sky: { t: 3, s: 60, c: true, col: "33DDF5", fb: ["metal"], st: "tool5", r: [["naturesaura:sky_ingot", 1]] },
     skyroot: { t: 0, s: 20, c: true, col: "C9B06B", fb: ["wood", "stick", "primitive"], st: "wood8", pal: ["FF000000", "FF241F13", "FF423A23", "FF645835", "FF887748", "FFA89359", "FFC9B06B"], r: [["aether:skyroot_planks", 1], ["aether:skyroot_stick", 2]] },
     tf_giant: { t: 1, s: 47, c: false, col: "8C8C8C", fb: ["metal"], st: "tool5" },
     tf_glass: { t: 0, s: 48, c: false, col: "DDEEFF", fb: ["metal"], st: "tool5" },
@@ -52,7 +52,7 @@ global.KUBEJS_MATERIALS = {
     zanite: { t: 2, s: 22, c: true, col: "7A5CD6", fb: ["metal"], st: "tool6", r: [["aether:zanite_gemstone", 1]] },
     // ---- armor-only materials (feat/tinkers-armor): plating/maille stats + traits in data/kubejs/tinkering/materials ----
     aether_neptune: { t: 2, s: 70, c: false, col: "4FA3E8", fb: ["metal"], st: "tool5" },
-    aether_phoenix: { t: 3, s: 71, c: false, col: "F0701A", fb: ["metal"], st: "tool5" },
+    aether_phoenix: { t: 3, s: 71, c: false, col: "FF8A1F", fb: ["metal"], st: "tool5" },
     aether_obsidian: { t: 3, s: 72, c: false, col: "2A1F3D", fb: ["metal"], st: "tool5" },
     aether_sentry: { t: 1, s: 73, c: false, col: "A8A8B0", fb: ["metal"], st: "tool5" },
     tf_naga: { t: 1, s: 74, c: false, col: "4C9A3C", fb: ["metal"], st: "tool5" },
