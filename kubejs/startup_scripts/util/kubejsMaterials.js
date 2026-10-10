@@ -12,9 +12,9 @@
 // Names are prefixed kmat/KUBEJS_ to avoid clashes with feat/tinkers-all-tools' global helpers (renderInfo, shade).
 // Rhino: no spread/destructuring, no const in loops.
 
-// shared palettes (7 stops, ARGB): vibrant orange-tinted gold (also applied to tconstruct:gold in
-// client_scripts/kubejsMaterialsAssets.js so golden tools, golden armor and valkyrie trim match) and a bright neutral white
-global.KMAT_GOLD_PALETTE = ["FF000000", "FF8A3A00", "FFD06A00", "FFFFA41A", "FFFFC93A", "FFFFE45C", "FFFFF8C8"]
+// shared palettes (7 stops, ARGB): gold sampled from vanilla golden tools (Tinkers' gold has no tool-head sprites, so our
+// golden tool heads are generated from this; Tinkers' own pre-made gold armor sprites are kept) and a bright neutral white
+global.KMAT_GOLD_PALETTE = ["FF000000", "FF6E4A10", "FFA06A12", "FFD99413", "FFE6AF15", "FFF2E04A", "FFFAFC75"]
 var KMAT_WHITE = ["FF000000", "FF6A6A70", "FF9C9CA3", "FFC6C6CC", "FFE2E2E6", "FFF4F4F6", "FFFFFFFF"]
 
 global.KUBEJS_MATERIALS = {
