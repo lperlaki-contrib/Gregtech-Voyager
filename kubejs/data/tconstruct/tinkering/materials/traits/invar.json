@@ -1,0 +1,7 @@
+{
+    "default": [
+        { "level": 1, "name": "tconstruct:solid" },
+        { "level": 3, "name": "tconstruct:bane_of_sssss" },
+        { "level": 1, "name": "tconstruct:haste" }
+    ]
+}
