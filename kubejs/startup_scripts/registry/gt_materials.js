@@ -612,14 +612,20 @@ GTCEuStartupEvents.registry("gtceu:material", (event) => {
         .iconSet("metallic")
         .color("0xf35b75") // "#f35b75"
         .flags(frame, foil, long_rod, plates, rod, ring, no_smelt, bolt_and_screw)
-        .toolStats(ToolProperty.Builder.of(4, 16, 5000, 5).build())
+        .toolStats(ToolProperty.Builder.of(10, 7, 11400, 5).build()) // speed, attack, durability, level: gm_construct's Tinkers tools match IaF dragonsteel (8000 durability, speed 10, sword ~24)
+        // IaF dragonsteel armor (IafConfig defaults: base armor 12, toughness 6); durability 77 makes gm_construct's plating match IaF's piece durability (1760-2560). gm_construct turns this into plating stats.
+        // Side effect: GT also registers gtceu:dragonsteel_<fire|ice>_<helmet..boots> (hidden, see tinkers_plan.js)
+        .armorStats(ArmorProperty.Builder.of(77, [7, 12, 9, 6]).toughness(6.0).build())
 
     event.create("dragonsteel_ice")
         .ingot()
         .iconSet("metallic")
         .color("0x5baff3") // "#5baff3"
         .flags(frame, foil, long_rod, plates, rod, ring, no_smelt, bolt_and_screw)
-        .toolStats(ToolProperty.Builder.of(4, 16, 5000, 5).build())
+        .toolStats(ToolProperty.Builder.of(10, 7, 11400, 5).build()) // speed, attack, durability, level: gm_construct's Tinkers tools match IaF dragonsteel (8000 durability, speed 10, sword ~24)
+        // IaF dragonsteel armor (IafConfig defaults: base armor 12, toughness 6); durability 77 makes gm_construct's plating match IaF's piece durability (1760-2560). gm_construct turns this into plating stats.
+        // Side effect: GT also registers gtceu:dragonsteel_<fire|ice>_<helmet..boots> (hidden, see tinkers_plan.js)
+        .armorStats(ArmorProperty.Builder.of(77, [7, 12, 9, 6]).toughness(6.0).build())
 })
 
 /*

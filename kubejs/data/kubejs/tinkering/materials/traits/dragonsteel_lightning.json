@@ -10,19 +10,13 @@
     },
     {
       "level": 1,
-      "name": "kubejs:dragonsteel_flame"
+      "name": "kubejs:dragonsteel_bolt"
     }
   ],
   "perStat": {
-    "tconstruct:plating_helmet": [
+    "tconstruct:plating_boots": [
       {
         "level": 1,
-        "name": "kubejs:dragon_ward"
-      }
-    ],
-    "tconstruct:plating_chestplate": [
-      {
-        "level": 3,
         "name": "kubejs:dragon_ward"
       }
     ],
@@ -32,7 +26,13 @@
         "name": "kubejs:dragon_ward"
       }
     ],
-    "tconstruct:plating_boots": [
+    "tconstruct:plating_chestplate": [
+      {
+        "level": 3,
+        "name": "kubejs:dragon_ward"
+      }
+    ],
+    "tconstruct:plating_helmet": [
       {
         "level": 1,
         "name": "kubejs:dragon_ward"

@@ -1,0 +1,9 @@
+{
+  "default": [],
+  "perStat": {
+    "tconstruct:plating_boots": [],
+    "tconstruct:plating_leggings": [],
+    "tconstruct:plating_chestplate": [],
+    "tconstruct:plating_helmet": []
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "default": [],
+  "perStat": {
+    "tconstruct:plating_boots": [
+      {
+        "level": 1,
+        "name": "kubejs:set_phoenix"
+      }
+    ],
+    "tconstruct:plating_leggings": [
+      {
+        "level": 1,
+        "name": "kubejs:set_phoenix"
+      }
+    ],
+    "tconstruct:plating_chestplate": [
+      {
+        "level": 1,
+        "name": "kubejs:set_phoenix"
+      }
+    ],
+    "tconstruct:plating_helmet": [
+      {
+        "level": 1,
+        "name": "kubejs:set_phoenix"
+      }
+    ]
+  }
+}
