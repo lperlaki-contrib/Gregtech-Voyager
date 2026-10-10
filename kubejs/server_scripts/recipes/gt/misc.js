@@ -1,5 +1,11 @@
 ServerEvents.recipes((event) => {
-    const mcTiers = ["stone", "iron", "gold", "diamond", "netherite"]
+    // Vanilla stone/metal tool recipes are disabled on purpose: tools come from Tinkers (and GT recipes that now
+    // output Tinkers tools, see gregify/tinkers/tool_recipes.js). Wooden tools stay craftable but give Tinkers tools.
+    // The originals are hidden in EMI (client_scripts/tinkersAssets.js) from the startup plan.
+    // craftableGoldenTools (kubejs/config/tinkers_tools.json): keep the golden recipes so tool_recipes.js swaps them to kubejs:gold tools
+    const mcTiers = ["stone", "iron", "golden", "diamond", "netherite"].filter(
+        (t) => t != "golden" || !global.tinkersConfig().craftableGoldenTools
+    )
     // @ts-ignore
     function removeTools(tier) {
         event.remove({ output: `minecraft:${tier}_pickaxe` })

@@ -439,7 +439,7 @@ ServerEvents.recipes((event) => {
         'ev'
     )
     paramount_helper_hull_recipe('embassy', 
-        ['voyagercore:ev_specialized_helper_hull', 'kubejs:celestial_radio', 'minecraft:red_banner', 'minecraft:leather_chestplate'],
+        ['voyagercore:ev_specialized_helper_hull', 'kubejs:celestial_radio', 'minecraft:red_banner', 'tconstruct:travelers_chestplate'],
         ['gtceu:tungsten_steel 576'],
         'ev'
     )
