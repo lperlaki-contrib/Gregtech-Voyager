@@ -181,7 +181,7 @@ addSpecial("sword", "kubejs:aether_holy", SKY, ["aether:holy_sword"])
 addSpecial("sword", "kubejs:aether_lightning", SKY, ["aether:lightning_sword"])
 addSpecial("sword", "kubejs:aether_vampire", SKY, ["aether:vampire_blade"])
 addSpecial("sword", "kubejs:aether_pig_slayer", SKY, ["aether:pig_slayer"])
-addSpecial("sword", "kubejs:aether_hammer_of_kingbdogz", SKY, ["aether:hammer_of_kingbdogz"])
+addSpecial("mining_hammer", "kubejs:aether_hammer_of_kingbdogz", SKY, ["aether:hammer_of_kingbdogz"]) // Aether: 6 attack, 1.6 speed, 250 durability
 addSpecial("pickaxe", "kubejs:tf_giant", WOOD, ["twilightforest:giant_pickaxe"])
 addSpecial("cleaver", "kubejs:tf_giant", WOOD, ["twilightforest:giant_sword"])
 addSpecial("sword", "kubejs:tf_glass", WOOD, ["twilightforest:glass_sword"])
