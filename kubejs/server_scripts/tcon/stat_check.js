@@ -172,9 +172,14 @@ ServerEvents.customCommand("tinkers_input_check", (event) => {
 
 // /kubejs custom_command tinkers_test_chests: chests in a row east of the player with one of every Tinkers tool/armor made from
 // our materials (kubejs:* and dragonsteel: Aether, Twilight Forest, Ice and Fire, AE2, Nature's Aura abilities and set
-// bonuses), our knives, and one tool per enchantment modifier (tinkersEnchantModifiers.js) at its max level. Test only.
+// bonuses), our knives, one tool per enchantment modifier (tinkersEnchantModifiers.js) at its max level, and random loot
+// (enchanted vanilla tools through the loot conversion, Apotheosis affix items of every rarity). Test only.
 var SC_Blocks = Java.loadClass("net.minecraft.world.level.block.Blocks")
 var SC_ModifierId = Java.loadClass("slimeknights.tconstruct.library.modifiers.ModifierId")
+var SC_EnchHelper = Java.loadClass("net.minecraft.world.item.enchantment.EnchantmentHelper")
+var SC_LOOT_TOOLS = ["minecraft:iron_sword", "minecraft:iron_pickaxe", "minecraft:iron_axe", "minecraft:golden_sword",
+    "minecraft:golden_pickaxe", "minecraft:diamond_sword", "minecraft:diamond_pickaxe", "minecraft:diamond_shovel",
+    "minecraft:iron_helmet", "minecraft:diamond_chestplate", "minecraft:iron_boots"]
 var SC_ENCH_BASE = { // first allowed-tools entry -> the plan id whose Tinkers tool carries it
     "#tconstruct:modifiable/melee": "minecraft:iron_sword",
     "#tconstruct:modifiable/harvest": "minecraft:iron_pickaxe",
@@ -223,6 +228,29 @@ ServerEvents.customCommand("tinkers_test_chests", (event) => {
         }
     })
     let level = player.level
+    let rand = player.getRandom()
+    // random loot: vanilla tools enchanted like loot (level 30) through the real loot conversion (enchantments -> slotless
+    // modifiers + Shiny), and Apotheosis' random affix loot, 2 per rarity (common .. ancient)
+    SC_LOOT_TOOLS.forEach((id) => {
+        try {
+            let conv = global.toTinkersTool(SC_EnchHelper.enchantItem(rand, Item.of(id), 30, false))
+            if (conv) stacks.push(conv)
+        } catch (err) {
+            console.warn("[tinkers test chests] enchanted " + id + ": " + err)
+        }
+    })
+    try {
+        let LootController = Java.loadClass("dev.shadowsoffire.apotheosis.adventure.loot.LootController")
+        let RarityRegistry = Java.loadClass("dev.shadowsoffire.apotheosis.adventure.loot.RarityRegistry")
+        for (let r = 0; r < 6; r++) {
+            for (let n = 0; n < 2; n++) {
+                let item = LootController.createRandomLootItem(rand, RarityRegistry.byOrdinal(r).get(), player, level)
+                if (item && !item.isEmpty()) stacks.push(item)
+            }
+        }
+    } catch (err) {
+        console.warn("[tinkers test chests] Apotheosis affix loot: " + err)
+    }
     let origin = player.blockPosition()
     let chests = 0
     for (let i = 0; i < stacks.length; i += 27) {
