@@ -261,6 +261,7 @@ ServerEvents.customCommand("tinkers_test_chests", (event) => {
             for (let n = 0; n < 2; n++) {
                 let item = LootController.createRandomLootItem(rand, RarityRegistry.byOrdinal(r).get(), player, level)
                 if (!item || item.isEmpty()) continue
+                item = global.toTinkersTool(item) || item // vanilla affix entries (e.g. iron armor) convert like real loot
                 let plain = item.copy()
                 if (plain.nbt) {
                     let tag = plain.nbt.copy()
