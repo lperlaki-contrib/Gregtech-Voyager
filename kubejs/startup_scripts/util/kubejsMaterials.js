@@ -51,13 +51,13 @@ global.KUBEJS_MATERIALS = {
     skyroot: { t: 0, s: 20, c: true, col: "C9B06B", fb: ["wood", "stick", "primitive"], st: "wood8", pal: ["FF000000", "FF241F13", "FF423A23", "FF645835", "FF887748", "FFA89359", "FFC9B06B"], r: [["aether:skyroot_planks", 1], ["aether:skyroot_stick", 2]] },
     tf_giant: { t: 1, s: 47, c: false, col: "8C8C8C", fb: ["metal"], st: "tool5" },
     tf_glass: { t: 0, s: 48, c: false, col: "DDEEFF", fb: ["metal"], st: "tool5" },
-    tf_ice: { t: 0, s: 49, c: false, col: "AEE6FF", fb: ["metal"], st: "tool5" },
+    tf_ice: { t: 0, s: 49, c: false, col: "AEE6FF", fb: ["metal"], st: "tool6" }, // + ice bow limbs
     tf_mazebreaker: { t: 3, s: 50, c: false, col: "C8B27A", fb: ["metal"], st: "tool5" },
     valkyrie: { t: 3, s: 39, c: false, col: "E8E4F0", fb: ["metal"], st: "tool5", pal: KMAT_WHITE },
     zanite: { t: 2, s: 22, c: true, col: "7A5CD6", fb: ["metal"], st: "tool6", r: [["aether:zanite_gemstone", 1]] },
     // ---- armor-only materials (feat/tinkers-armor): plating/maille stats + traits in data/kubejs/tinkering/materials ----
     aether_neptune: { t: 2, s: 70, c: false, col: "4FA3E8", fb: ["metal"], st: "tool5" },
-    aether_phoenix: { t: 3, s: 71, c: false, col: "FF8A1F", fb: ["metal"], st: "tool5" },
+    aether_phoenix: { t: 3, s: 71, c: false, col: "FF8A1F", fb: ["metal"], st: "tool6" }, // + phoenix bow limbs
     aether_obsidian: { t: 3, s: 72, c: false, col: "2A1F3D", fb: ["metal"], st: "tool5" },
     aether_sentry: { t: 1, s: 73, c: false, col: "A8A8B0", fb: ["metal"], st: "tool5" },
     tf_naga: { t: 1, s: 74, c: false, col: "4C9A3C", fb: ["metal"], st: "tool5" },
@@ -66,7 +66,12 @@ global.KUBEJS_MATERIALS = {
     tf_phantom: { t: 2, s: 77, c: false, col: "B8C4D8", fb: ["metal"], st: "tool5" },
     iaf_dragon_scale: { t: 2, s: 78, c: false, col: "C0392B", fb: ["metal"], st: "tool5" },
     iaf_tide: { t: 3, s: 79, c: false, col: "2BB3A4", fb: ["metal"], st: "tool5" },
-    iaf_deathworm: { t: 1, s: 80, c: false, col: "C9A24A", fb: ["metal"], st: "tool5" }
+    iaf_deathworm: { t: 1, s: 80, c: false, col: "C9A24A", fb: ["metal"], st: "tool5" },
+    // ---- bow limb / shield plating materials (feat/tinkers-ranged): loot-only Twilight Forest bows, Enderman Overhaul shield ----
+    tf_ender: { t: 2, s: 81, c: false, col: "3DA88F", fb: ["metal"], st: "tool6" },
+    tf_seeker: { t: 2, s: 82, c: false, col: "C9B26B", fb: ["metal"], st: "tool6" },
+    tf_triple: { t: 2, s: 83, c: false, col: "8A6A44", fb: ["metal"], st: "tool6" },
+    eo_corrupted: { t: 2, s: 84, c: false, col: "5A2A7A", fb: ["metal"], st: "tool5", r: [["endermanoverhaul:enderman_tooth", 1]] }
 }
 
 var kmatStatProfiles = {
@@ -75,7 +80,7 @@ var kmatStatProfiles = {
     tool6: ["head", "handle", "binding", "repair_kit", "limb", "grip"],
     wood8: ["head", "handle", "binding", "repair_kit", "limb", "grip", "shield_core", "arrow_shaft"]
 }
-var kmatArmorStats = ["armor_plating", "plating_helmet", "plating_chestplate", "plating_leggings", "plating_boots", "maille", "armor_maille"]
+var kmatArmorStats = ["armor_plating", "plating_helmet", "plating_chestplate", "plating_leggings", "plating_boots", "plating_shield", "maille", "armor_maille"]
 var kmatGreys = [0, 63, 102, 140, 178, 216, 255]
 var kmatFactors = [0, 0.18, 0.33, 0.5, 0.68, 0.84, 1.0]
 
