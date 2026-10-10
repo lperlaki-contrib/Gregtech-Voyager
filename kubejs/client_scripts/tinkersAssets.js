@@ -161,7 +161,7 @@ ClientEvents.loggedIn(() => {
     function check(m) {
         if (seen[m]) return
         seen[m] = true
-        let p = m.split(":")
+        let p = m.replace("#", ".").split(":") // variants: tconstruct:rock#stone -> material.tconstruct.rock.stone
         if (!I18n.exists("material." + p[0] + "." + p[1])) missing.push(m)
     }
     Object.keys(global.TINKERS_PLAN).forEach((id) => {

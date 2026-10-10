@@ -13,7 +13,7 @@ var TR_VanillaIngredient = Java.loadClass("net.minecraft.world.item.crafting.Ing
 var TR_JsonParser = Java.loadClass("com.google.gson.JsonParser")
 var TR_TierSorting = Java.loadClass("net.minecraftforge.common.TierSortingRegistry")
 // display examples per harvest level (wood, stone, iron, diamond, netherite tier) so EMI shows the minimum tier
-var TR_TIER_EXAMPLES = ["tconstruct:wood", "tconstruct:rock", "tconstruct:iron", "tconstruct:cobalt", "tconstruct:manyullyn"]
+var TR_TIER_EXAMPLES = ["tconstruct:wood", "tconstruct:rock#stone", "tconstruct:iron", "tconstruct:cobalt", "tconstruct:manyullyn"]
 var TR_TIER_NAMES = ["minecraft:wood", "minecraft:stone", "minecraft:iron", "minecraft:diamond", "minecraft:netherite"] // their harvest tiers
 var TR_TIER_LABELS = ["Wood", "Stone", "Iron", "Diamond", "Netherite"]
 var TR_JsonArray = Java.loadClass("com.google.gson.JsonArray")
@@ -47,7 +47,7 @@ ServerEvents.recipes((event) => {
 
     // ---- tool inputs: id -> Forge ingredient (built once per id) ----
     const OUTPUT_KEYS = ["result", "results", "output", "outputs"]
-    const EARLY_MATS = ["tconstruct:wood", "tconstruct:rock", "tconstruct:flint"]
+    const EARLY_MATS = ["tconstruct:wood", "tconstruct:rock#stone", "tconstruct:flint"]
     const inputCache = {}
     let exampleWarned = false
     function inputFor(id) {
