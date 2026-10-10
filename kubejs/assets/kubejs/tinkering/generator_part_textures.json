@@ -1,0 +1,45 @@
+{
+  "parts": [
+    {
+      "path": "kubejs:item/tool/knife/blade",
+      "stat_type": "tconstruct:head"
+    },
+    {
+      "path": "kubejs:item/tool/knife/blade_broken",
+      "stat_type": "tconstruct:head"
+    },
+    {
+      "path": "kubejs:item/tool/knife/handle",
+      "stat_type": "tconstruct:handle"
+    },
+    {
+      "path": "kubejs:item/tool/butcher_knife/blade",
+      "stat_type": "tconstruct:head"
+    },
+    {
+      "path": "kubejs:item/tool/butcher_knife/blade_broken",
+      "stat_type": "tconstruct:head"
+    },
+    {
+      "path": "kubejs:item/tool/butcher_knife/handle",
+      "stat_type": "tconstruct:handle"
+    },
+    {
+      "path": "kubejs:item/tool/shovel/head",
+      "stat_type": "tconstruct:head"
+    },
+    {
+      "path": "kubejs:item/tool/shovel/head_broken",
+      "stat_type": "tconstruct:head"
+    },
+    {
+      "path": "kubejs:item/tool/shovel/handle",
+      "stat_type": "tconstruct:handle"
+    },
+    {
+      "path": "kubejs:item/tool/shovel/binding",
+      "stat_type": "tconstruct:binding"
+    }
+  ],
+  "replace": false
+}
