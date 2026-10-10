@@ -33,6 +33,10 @@ global.toTinkersTool = (stack) => {
 var TL_armorOn = global.tinkersConfig().convertArmor
 var TL_EquipmentSlot = Java.loadClass("net.minecraft.world.entity.EquipmentSlot")
 var TL_SLOTS = [TL_EquipmentSlot.MAINHAND, TL_EquipmentSlot.HEAD, TL_EquipmentSlot.CHEST, TL_EquipmentSlot.LEGS, TL_EquipmentSlot.FEET]
+// Mobs keep bows and crossbows: skeleton/pillager AI (AbstractSkeleton.reassessWeaponGoal, Pillager/RangedCrossbowAttackGoal) only
+// shoots with a BowItem/CrossbowItem, and Tinkers launchers are plain ProjectileWeaponItems (ModifiableLauncherItem). They are
+// converted when the mob DROPS them instead (EntityEvents.drops below), so players still only end up with Tinkers bows.
+var TL_MOB_KEEPS = { bow: true, crossbow: true }
 
 LootJS.modifiers((event) => {
     // LootJS matches table-id regexes with Matcher.matches() (WHOLE id), so patterns must consume the full id (.*).
@@ -61,8 +65,21 @@ EntityEvents.spawned((event) => {
         let st = e.getItemBySlot(slot)
         if (st.empty) continue
         let p = global.TINKERS_PLAN[String(st.id)]
-        if (!p || (i > 0 ? !p.armor : p.armor && !TL_armorOn)) continue
+        if (!p || (i > 0 ? !p.armor : (p.armor && !TL_armorOn) || TL_MOB_KEEPS[p.type])) continue
         let t = global.toTinkersTool(st)
         if (t) e.setItemSlot(slot, t)
     }
+})
+
+// Mob drops (equipment drops such as a skeleton's bow, items mobs picked up, offhand shields): converted like loot. Not players
+// (their own inventory stays as it is).
+EntityEvents.drops((event) => {
+    if (event.entity.isPlayer()) return
+    event.drops.forEach((ie) => {
+        let st = ie.item
+        let p = global.TINKERS_PLAN[String(st.id)]
+        if (!p || (p.armor && !TL_armorOn)) return
+        let t = global.toTinkersTool(st)
+        if (t) ie.setItem(t)
+    })
 })

@@ -1,7 +1,7 @@
 // Crafting a tool yields the Tinkers equivalent instead: the original recipe is kept, only its output is swapped.
 // What is converted, and with which materials, is decided once at startup (startup_scripts/tinkers/tinkers_plan.js).
 // Shovel -> kubejs:shovel, hoe -> kama; GT crafting tools -> gregic tools; knives (GT, FD) -> kubejs:knife. Only the GT mortar and
-// shears stay GT. Armor (cfg convertArmor): iron/gold/mod armor -> Tinkers plate armor, leather -> travelers gear; same stand-in rules. Stand-in recipes (diamond/netherite) are never swapped; golden TOOLS follow craftableGoldenTools, golden armor stays craftable (tinkers_tools.json).
+// shears stay GT. Bow -> longbow, crossbow -> crossbow, shield -> plate shield (explicit SPECIAL entries). Armor (cfg convertArmor): iron/gold/mod armor -> Tinkers plate armor, leather -> travelers gear; same stand-in rules. Stand-in recipes (diamond/netherite) are never swapped; golden TOOLS follow craftableGoldenTools, golden armor stays craftable (tinkers_tools.json).
 // Recipes that CONSUME a converted tool (Ars glyphs, IF machines, turtles, Blood Magic, ...) would be uncraftable, so that input
 // becomes "any Tinkers tool of the converted kind (e.g. any tconstruct:pickaxe), not broken, harvest tier >= the original's"
 // as a pure Forge ingredient (forge:difference of partial_nbt, see inputFor); armor: any Tinkers piece of that slot.
@@ -240,6 +240,7 @@ ServerEvents.recipes((event) => {
     }
     // Aether "repairing" recipes (damaged armor + material -> armor) would output Tinkers armor; the original armor no longer exists
     if (cfg.convertArmor) event.remove({ id: /^aether:.*_(helmet|chestplate|leggings|boots)_repairing$/ })
+    event.remove({ id: /^aether:(bow|crossbow|shield)_repairing$/ }) // same for the vanilla bow/crossbow/shield (now Tinkers)
     function outputOf(r) {
         // cheap rejection first: machine recipes (GT) have no "result" key; skip them before reading/stringifying anything.
         // (GT tool crafting recipes are generated at runtime, so their type can't be checked offline; every crafting-type

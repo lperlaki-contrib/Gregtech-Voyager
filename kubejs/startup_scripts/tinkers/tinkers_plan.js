@@ -41,7 +41,8 @@ global.TINKERS_SHOVEL = ["kubejs:shovel", "hw"]
 // Set to false if those are not merged (the tools are then left alone).
 global.AETHER_TINKERS_MATERIALS = true
 
-// Part slots: h = head material, w = handle material (tconstruct:wood unless the mod has its own), c = casing, e = engine, b = battery.
+// Part slots: h = head material, w = handle material (tconstruct:wood unless the mod has its own), c = casing, e = engine, b = battery,
+// s = bowstring (tconstruct:string). Bows/crossbows: h = limbs, w = grip. Shields: w = shield core, h = shield plating.
 // Composition follows the GT crafting recipe: plates/ingots/rods of the material -> h (bindings and guards too), the wooden
 // stick -> w; tools made entirely of the material (wrench, crowbar, wire cutter) are all h.
 // Part order per tool: data/tconstruct/tinkering/tool_definitions + data/gregic_tinkering/tinkering/tool_definitions.
@@ -78,7 +79,11 @@ const TINKERS_SPECS = {
     travelers_helmet: ["tconstruct:travelers_helmet", "pl"],
     travelers_chestplate: ["tconstruct:travelers_chestplate", "pl"],
     travelers_leggings: ["tconstruct:travelers_leggings", "pl"],
-    travelers_boots: ["tconstruct:travelers_boots", "pl"]
+    travelers_boots: ["tconstruct:travelers_boots", "pl"],
+    // ranged + shields (only explicit SPECIAL entries; mobs keep their bows/crossbows, see lootbags/tinkers_loot.js)
+    bow: ["tconstruct:longbow", "hhws"], // bow_limb x2, bow_grip, bowstring
+    crossbow: ["tconstruct:crossbow", "hws"], // bow_limb, bow_grip, bowstring
+    shield: ["tconstruct:plate_shield", "wh"] // shield_core, plating_shield
 }
 // GT electric tools -> gregic powered tools: [head, casing, engine, battery]
 const TINKERS_POWERED = {
@@ -205,6 +210,21 @@ addSpecial("sword", "kubejs:iaf_troll", NECRO, [
 ])
 addSpecial("sword", "kubejs:myrmex_desert_chitin", NECRO, ["iceandfire:myrmex_desert_sword_venom"])
 addSpecial("sword", "kubejs:myrmex_jungle_chitin", NECRO, ["iceandfire:myrmex_jungle_sword_venom"])
+// Bows, crossbows, shields (feat/tinkers-ranged). Vanilla: wooden longbow (bow: sticks + string), crossbow with iron limbs (its
+// iron ingot) and a wooden grip, shield = wood core + iron plating. Mod bows keep their durability (384) and get their ability as a
+// named modifier on the limb material (startup_scripts/tinkers_special_ranged.js). Dragonbone bow: dragonbone limbs + wither bone
+// grip, like its recipe; it has no ability (its only quirk, dragon-arrows-only ammo, is dropped).
+addSpecial("bow", WOOD, WOOD, ["minecraft:bow"])
+addSpecial("crossbow", "tconstruct:iron", WOOD, ["minecraft:crossbow"])
+addSpecial("shield", "tconstruct:iron", WOOD, ["minecraft:shield"])
+addSpecial("shield", "tconstruct:knightmetal", WOOD, ["twilightforest:knightmetal_shield"])
+addSpecial("shield", "kubejs:eo_corrupted", WOOD, ["endermanoverhaul:corrupted_shield"])
+addSpecial("bow", "kubejs:tf_ice", WOOD, ["twilightforest:ice_bow"])
+addSpecial("bow", "kubejs:tf_ender", WOOD, ["twilightforest:ender_bow"])
+addSpecial("bow", "kubejs:tf_seeker", WOOD, ["twilightforest:seeker_bow"])
+addSpecial("bow", "kubejs:tf_triple", WOOD, ["twilightforest:triple_bow"])
+addSpecial("bow", "kubejs:aether_phoenix", SKY, ["aether:phoenix_bow"])
+addSpecial("bow", "kubejs:dragonbone", NECRO, ["iceandfire:dragonbone_bow"])
 
 // Forestry "Survivalist's" bronze tools and the kits that unpack into them (right-click): not obtainable any more (their recipes are
 // removed in tool_recipes.js); leftovers in loot become Tinkers bronze tools, and the kits themselves convert in loot too.
@@ -238,12 +258,14 @@ global.TINKERS_LOOT_SOURCES = [
     ["aether_valkyrie", "Dropped by Valkyries and found in Silver Dungeon chests (The Aether).",
         ["aether:valkyrie_pickaxe", "aether:valkyrie_axe", "aether:valkyrie_shovel", "aether:valkyrie_hoe"]],
     ["aether_bronze", "Found in Bronze Dungeon reward chests (The Aether).",
-        ["aether:valkyrie_lance", "aether:flaming_sword", "aether:hammer_of_kingbdogz"]],
+        ["aether:valkyrie_lance", "aether:flaming_sword", "aether:hammer_of_kingbdogz", "aether:phoenix_bow"]],
     ["aether_silver", "Found in Silver Dungeon reward chests (The Aether).", ["aether:holy_sword", "aether:lightning_sword"]],
     ["aether_gold", "Found in Gold Dungeon reward chests (The Aether).", ["aether:vampire_blade", "aether:pig_slayer"]],
     ["aether_present", "Found in Presents (The Aether).", ["aether:candy_cane_sword"]],
     ["tf_giant", "Dropped by Giants (Twilight Forest).", ["twilightforest:giant_pickaxe", "twilightforest:giant_sword"]],
-    ["tf_aurora", "Found in Aurora Palace chests (Twilight Forest).", ["twilightforest:glass_sword", "twilightforest:ice_sword"]],
+    ["tf_aurora", "Found in Aurora Palace chests (Twilight Forest).",
+        ["twilightforest:glass_sword", "twilightforest:ice_sword", "twilightforest:ice_bow", "twilightforest:ender_bow"]],
+    ["tf_snow_queen", "Dropped by the Snow Queen (Twilight Forest).", ["twilightforest:seeker_bow", "twilightforest:triple_bow"]],
     ["tf_labyrinth", "Found in the Labyrinth vault (Twilight Forest).", ["twilightforest:mazebreaker_pickaxe"]],
     ["tf_minotaur", "Carried or dropped by Minotaurs and Minoshroom (Twilight Forest).",
         ["twilightforest:gold_minotaur_axe", "twilightforest:diamond_minotaur_axe"]],
@@ -397,6 +419,13 @@ const autoMaterial = (item, name) => {
     return id
 }
 
+// bows/crossbows/shields without a SPECIAL entry are logged as skipped (Botania, Ars, Forbidden Arcanus, IF launcher, ...)
+const TT_RANGED_CLASSES = [
+    Java.loadClass("net.minecraft.world.item.BowItem"), Java.loadClass("net.minecraft.world.item.CrossbowItem"),
+    Java.loadClass("net.minecraft.world.item.ShieldItem")
+]
+const isRangedOrShield = (item) => TT_RANGED_CLASSES.some((c) => item instanceof c)
+
 const toolType = (item) => {
     for (let i = 0; i < TOOL_CLASSES.length; i++) if (item instanceof TOOL_CLASSES[i][1]) return TOOL_CLASSES[i][0]
     return null
@@ -513,6 +542,7 @@ const planFor = (id, item) => {
         return { type: gType, mat: gMat, volt: gVolt, standIn: !!gStand, src: "gt api" }
     }
 
+    if (isRangedOrShield(item)) return { skip: SKIP_NS[ns] || "bow/crossbow/shield without a mapping" }
     let tType = toolType(item)
     if (SKIP_NS[ns]) return tType ? { skip: SKIP_NS[ns] } : null
     if (!tType) return null
@@ -681,6 +711,7 @@ global.tinkersPartsFor = (id) => {
         if (s == "h" || s == "p") return p.mat
         if (s == "m") return ARMOR_MAILLE_FOR[p.mat] || (p.mat.indexOf("kubejs:") == 0 ? p.mat : ARMOR_MAILLE)
         if (s == "l") return "tconstruct:leather"
+        if (s == "s") return "tconstruct:string"
         if (s == "c") return "tconstruct:steel"
         if (s == "e") return "gregic_tinkering:" + p.volt + "_electric"
         if (s == "b") return TINKERS_BATTERY[p.volt]
