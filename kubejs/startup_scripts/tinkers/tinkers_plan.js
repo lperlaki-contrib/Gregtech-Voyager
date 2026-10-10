@@ -411,6 +411,9 @@ const toolType = (item) => {
 // (its only trait, Tanned, is irrelevant on armor; iron would add Magnetic, gold/silver add armor traits).
 const TT_ArmorItem = Java.loadClass("net.minecraft.world.item.ArmorItem")
 const ARMOR_MAILLE = "tconstruct:leather"
+// our (kubejs:) armor materials use themselves as maille for a consistent look (their maille traits are empty, see
+// data/kubejs/tinkering/materials/traits); exceptions: a secondary material
+const ARMOR_MAILLE_FOR = { "kubejs:valkyrie": "tconstruct:gold" }
 const ARMOR_SLOT = { head: "helmet", chest: "chestplate", legs: "leggings", feet: "boots" }
 const ARMOR_NS = { minecraft: true, aether: true, twilightforest: true, iceandfire: true }
 const AETHER_ARMOR = {
@@ -674,7 +677,7 @@ global.tinkersPartsFor = (id) => {
     const handle = p.handle || HANDLE_BY_NS(String(id))
     const mats = slots.split("").map((s) => {
         if (s == "h" || s == "p") return p.mat
-        if (s == "m") return ARMOR_MAILLE
+        if (s == "m") return ARMOR_MAILLE_FOR[p.mat] || (p.mat.indexOf("kubejs:") == 0 ? p.mat : ARMOR_MAILLE)
         if (s == "l") return "tconstruct:leather"
         if (s == "c") return "tconstruct:steel"
         if (s == "e") return "gregic_tinkering:" + p.volt + "_electric"
