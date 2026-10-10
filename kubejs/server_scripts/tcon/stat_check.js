@@ -169,3 +169,70 @@ ServerEvents.customCommand("tinkers_input_check", (event) => {
     console.info(summary)
     if (event.player) event.player.tell(summary)
 })
+
+// /kubejs custom_command tinkers_test_chests: chests in a row east of the player with one of every Tinkers tool/armor made from
+// our materials (kubejs:* and dragonsteel: Aether, Twilight Forest, Ice and Fire, AE2, Nature's Aura abilities and set
+// bonuses), our knives, and one tool per enchantment modifier (tinkersEnchantModifiers.js) at its max level. Test only.
+var SC_Blocks = Java.loadClass("net.minecraft.world.level.block.Blocks")
+var SC_ModifierId = Java.loadClass("slimeknights.tconstruct.library.modifiers.ModifierId")
+var SC_ENCH_BASE = { // first allowed-tools entry -> the plan id whose Tinkers tool carries it
+    "#tconstruct:modifiable/melee": "minecraft:iron_sword",
+    "#tconstruct:modifiable/harvest": "minecraft:iron_pickaxe",
+    "#tconstruct:modifiable/harvest/stone": "minecraft:iron_pickaxe",
+    "tconstruct:hand_axe": "minecraft:iron_axe",
+    "tconstruct:kama": "minecraft:iron_hoe",
+    "#tconstruct:modifiable/durability": "minecraft:iron_pickaxe",
+    "#tconstruct:modifiable/armor/chestplate": "minecraft:iron_chestplate",
+    "#tconstruct:modifiable/armor/leggings": "minecraft:iron_leggings",
+    "#tconstruct:modifiable/armor/boots": "minecraft:iron_boots"
+}
+ServerEvents.customCommand("tinkers_test_chests", (event) => {
+    let player = event.player
+    if (!player) return
+    global.tinkersEnsurePlan()
+    let plan = global.TINKERS_PLAN
+    let stacks = []
+    let seen = {}
+    let knives = 0
+    Object.keys(plan).sort().forEach((id) => {
+        let parts = global.tinkersPartsFor(id)
+        if (!parts) return
+        let ours = parts.mats.some((m) => m.indexOf("kubejs:") == 0 || m.indexOf("dragonsteel") >= 0)
+        let knife = parts.tool == "kubejs:knife" || parts.tool == "kubejs:butcher_knife"
+        if (!ours && !(knife && knives < 2)) return
+        let key = parts.tool + "|" + parts.mats.join(",")
+        if (seen[key]) return
+        seen[key] = true
+        if (!ours) knives++
+        stacks.push(global.tinkersStackFor(id))
+    })
+    let table = global.TINKERS_ENCH_MODIFIERS || {}
+    Object.keys(table).forEach((ench) => {
+        let e = table[ench]
+        let baseId = SC_ENCH_BASE[e.tl ? e.tl[0] : "#tconstruct:modifiable/melee"]
+        let stack = baseId ? global.tinkersStackFor(baseId) : null
+        if (!stack) return
+        try {
+            let tool = SC_ToolStack.from(stack)
+            tool.addModifier(SC_ModifierId.tryParse(global.temModifierId(ench)), e.max || 1)
+            tool.rebuildStats()
+            stack.setHoverName(Text.of(global.temModifierId(ench)).gold())
+            stacks.push(stack)
+        } catch (err) {
+            console.warn("[tinkers test chests] " + ench + ": " + err) // modifier missing (enchantment not registered)
+        }
+    })
+    let level = player.level
+    let origin = player.blockPosition()
+    let chests = 0
+    for (let i = 0; i < stacks.length; i += 27) {
+        let pos = origin.offset(2 + chests * 2, 0, 0)
+        level.setBlock(pos, SC_Blocks.CHEST.defaultBlockState(), 3)
+        let be = level.getBlockEntity(pos)
+        for (let k = 0; k < 27 && i + k < stacks.length; k++) be.setItem(k, stacks[i + k])
+        chests++
+    }
+    let msg = "[tinkers test chests] " + stacks.length + " items in " + chests + " chests east of you (every 2nd block)"
+    console.info(msg)
+    player.tell(msg)
+})
