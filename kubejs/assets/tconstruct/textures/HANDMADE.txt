@@ -1,0 +1,6 @@
+Committed Tinkers part textures for our kubejs: materials. Keep this lean: by default Tinkers draws a material with its
+fallback sprites tinted by the render info "color" (no files needed). Only add textures when that is not good enough.
+
+Generated (/tconstruct generate part_textures all, copy ONLY the listed material's *_kubejs_<material>.png files from
+resourcepacks/TinkersConstructGeneratedPartTextures/assets into kubejs/assets):
+  - kubejs:gold  palette (global.KMAT_GOLD_PALETTE) - the plain tint looked olive
