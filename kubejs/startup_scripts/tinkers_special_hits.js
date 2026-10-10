@@ -31,6 +31,13 @@ function tshIaf() {
     }
 }
 
+// Drops an item at the entity. Not spawnAtLocation: its ItemStack/ItemLike overloads are ambiguous for Rhino (throws).
+var TSH_ItemEntity = Java.loadClass("net.minecraft.world.entity.item.ItemEntity")
+function tshDrop(target, id) {
+    var level = target.level
+    level.addFreshEntity(new TSH_ItemEntity(level, target.x, target.y + 0.5, target.z, Item.of(id)))
+}
+
 var tshSweeping = false // re-entry guard for the hippogryph / soulstrider sweeps
 
 // Object mapping every kubejs:* modifier id of the stack (without namespace) to true, or null if there is none
@@ -100,7 +107,16 @@ function tshStrike(target, attacker) {
     bolt.spawn()
 }
 
+// The handler never throws: an exception inside LivingDamageEvent cancels the hit's damage (seen in playtest: a failing
+// candy cane drop made every other full-strength hit deal nothing).
 ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingDamageEvent", function (event) {
+    try {
+        tshOnDamage(event)
+    } catch (e) {
+        console.error("[tinkers special hits] " + e)
+    }
+})
+function tshOnDamage(event) {
     if (tshSweeping) return
     var src = event.source
     var attacker = src.actual
@@ -117,7 +133,7 @@ ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingDamageEvent", 
     if (tshFull(attacker)) {
         // CandyCaneSwordItem.hurtEnemy: target not a player, nextBoolean() -> candy cane
         if (m.aether_candy_cane_drops === true && tt != "minecraft:player" && level.random.nextBoolean()) {
-            target.spawnAtLocation(Item.of("aether:candy_cane"))
+            tshDrop(target, "aether:candy_cane")
         }
         // FlamingSwordItem.onLivingDamage: 30 s of fire + 4 s per Fire Aspect level
         if (m.aether_flaming_blade === true) {
@@ -235,7 +251,7 @@ ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingDamageEvent", 
     // ---- Holystone sword: 1/25 ambrosium shard at the target (players excluded) ----
     if (m.holystone_blessing === true && tshIsSword(tool) && tshFull(attacker) && !target.isPlayer()
         && level.random.nextInt(25) == 0) {
-        target.spawnAtLocation(Item.of("aether:ambrosium_shard"))
+        tshDrop(target, "aether:ambrosium_shard")
     }
 
     // ---- Nature's Aura blades (ItemSword.hurtEnemy): botanist Slowness III 3 s, skyseeker Levitation III 3 s,
@@ -264,4 +280,4 @@ ForgeEvents.onEvent("net.minecraftforge.event.entity.living.LivingDamageEvent", 
             attacker.sweepAttack()
         }
     }
-})
+}
