@@ -177,6 +177,7 @@ ServerEvents.customCommand("tinkers_input_check", (event) => {
 //      Nature's Aura abilities and set bonuses) | the original item they replace (same material; the Tinkers version of a
 //      material always carries its ability)
 //   3. our knives | the original knife
+//   3b. powered tools, one per GT tool type and voltage: gregic Tinkers version | GT's original, both fully charged
 //   4. one tool per enchantment modifier (tinkersEnchantModifiers.js) at max level | the same Tinkers tool without it
 //   5. vanilla tools enchanted like loot (level 30) through the real loot conversion | the original enchanted item
 //   6. Apotheosis random affix loot, 2 per rarity | the same item without its affixes
@@ -185,6 +186,7 @@ var SC_ModifierId = Java.loadClass("slimeknights.tconstruct.library.modifiers.Mo
 var SC_EnchHelper = Java.loadClass("net.minecraft.world.item.enchantment.EnchantmentHelper")
 var SC_ForgeRegistries = Java.loadClass("net.minecraftforge.registries.ForgeRegistries")
 var SC_ResourceLocation = Java.loadClass("net.minecraft.resources.ResourceLocation")
+var SC_GTCap = Java.loadClass("com.gregtechceu.gtceu.api.capability.GTCapabilityHelper")
 var SC_CHEST = "sophisticatedstorage:netherite_chest"
 var SC_ROW = 12 // netherite chest: 132 slots, 12 per row
 var SC_LOOT_TOOLS = ["minecraft:iron_sword", "minecraft:iron_pickaxe", "minecraft:iron_axe", "minecraft:golden_sword",
@@ -200,6 +202,16 @@ var SC_ENCH_BASE = { // first allowed-tools entry -> the plan id whose Tinkers t
     "#tconstruct:modifiable/armor/chestplate": "minecraft:iron_chestplate",
     "#tconstruct:modifiable/armor/leggings": "minecraft:iron_leggings",
     "#tconstruct:modifiable/armor/boots": "minecraft:iron_boots"
+}
+// fully charged copy (GT electric capability; gregic_tinkering exposes the same one on its Tinkers tools)
+function scCharged(stack) {
+    try {
+        let e = SC_GTCap.getElectricItem(stack)
+        if (e != null) e.charge(e.getMaxCharge(), e.getTier(), true, false)
+    } catch (err) {
+        console.warn("[tinkers test chests] charging " + stack.id + ": " + err)
+    }
+    return stack
 }
 ServerEvents.customCommand("tinkers_test_chests", (event) => {
     let player = event.player
@@ -223,6 +235,15 @@ ServerEvents.customCommand("tinkers_test_chests", (event) => {
         if (!ours) knives.push(pair)
         else if (plan[id].armor) armor.push(pair)
         else tools.push(pair)
+    })
+    // powered tools: one per GT tool type and voltage, the gregic Tinkers version | GT's original, both fully charged
+    let powered = []
+    let poweredSeen = {}
+    Object.keys(plan).sort().forEach((id) => {
+        let p = plan[id]
+        if (!p.volt || poweredSeen[p.type + "|" + p.volt]) return
+        poweredSeen[p.type + "|" + p.volt] = true
+        powered.push([scCharged(global.tinkersStackFor(id)), scCharged(Item.of(id))])
     })
     let enchanted = []
     let table = global.TINKERS_ENCH_MODIFIERS || {}
@@ -292,7 +313,8 @@ ServerEvents.customCommand("tinkers_test_chests", (event) => {
         chests++
     }
     nextChest()
-    ;[tools, armor, knives, enchanted, loot, affixed].forEach((section) => {
+    
+    ;[tools, armor, knives, powered, enchanted, loot, affixed].forEach((section) => {
         if (slot % SC_ROW != 0) slot += SC_ROW - (slot % SC_ROW) // new row
         section.forEach((pair) => {
             if (slot % SC_ROW > SC_ROW - 2) slot += SC_ROW - (slot % SC_ROW) // pair must fit in the row
@@ -304,7 +326,7 @@ ServerEvents.customCommand("tinkers_test_chests", (event) => {
         })
     })
     let msg = "[tinkers test chests] " + items + " items (" + tools.length + " tools, " + armor.length + " armor, " + knives.length +
-        " knives, " + enchanted.length + " enchant modifiers, " + loot.length + " enchanted loot, " + affixed.length +
+        " knives, " + powered.length + " powered, " + enchanted.length + " enchant modifiers, " + loot.length + " enchanted loot, " + affixed.length +
         " affix loot) in " + chests + " chests east of you; left = ours, right = compare"
     console.info(msg)
     player.tell(msg)
