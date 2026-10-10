@@ -57,8 +57,10 @@ function affixLevelUpdated(stack) {
     if (nbt == null || !nbt.contains('tic_materials') || !nbt.contains('affix_data')) return null
     var min = AFFIX_MIN_LEVEL[String(nbt.getCompound('affix_data').getString('rarity')).replace(/^.*:/, '')]
     if (!min || (nbt.contains('currentToolLevel') && nbt.getInt('currentToolLevel') >= min)) return null
+    nbt = nbt.copy()
+    nbt.putInt('currentToolLevel', min)
     var out = stack.copy()
-    out.nbt.putInt('currentToolLevel', min)
+    out.nbt = nbt
     return out
 }
 
