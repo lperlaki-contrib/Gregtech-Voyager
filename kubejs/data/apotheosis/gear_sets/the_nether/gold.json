@@ -1,0 +1,100 @@
+{
+  "weight": 120,
+  "mainhands": [
+    {
+      "weight": 3,
+      "stack": {
+        "item": "tconstruct:sword",
+        "nbt": {
+          "tic_materials": [
+            "kubejs:gold",
+            "tconstruct:wood",
+            "kubejs:gold"
+          ]
+        }
+      }
+    },
+    {
+      "weight": 3,
+      "stack": {
+        "item": "tconstruct:hand_axe",
+        "nbt": {
+          "tic_materials": [
+            "kubejs:gold",
+            "tconstruct:wood",
+            "kubejs:gold"
+          ]
+        }
+      }
+    },
+    {
+      "weight": 2,
+      "stack": {
+        "item": "tconstruct:pickaxe",
+        "nbt": {
+          "tic_materials": [
+            "kubejs:gold",
+            "tconstruct:wood",
+            "kubejs:gold"
+          ]
+        }
+      }
+    },
+    {
+      "weight": 2,
+      "stack": {
+        "item": "kubejs:shovel",
+        "nbt": {
+          "tic_materials": [
+            "kubejs:gold",
+            "tconstruct:wood",
+            "kubejs:gold"
+          ]
+        }
+      }
+    }
+  ],
+  "offhands": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:shield"
+      }
+    }
+  ],
+  "boots": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:golden_boots"
+      }
+    }
+  ],
+  "leggings": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:golden_leggings"
+      }
+    }
+  ],
+  "chestplates": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:golden_chestplate"
+      }
+    }
+  ],
+  "helmets": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:golden_helmet"
+      }
+    }
+  ],
+  "tags": [
+    "the_nether"
+  ]
+}

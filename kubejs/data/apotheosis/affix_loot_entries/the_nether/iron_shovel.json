@@ -1,0 +1,20 @@
+{
+  "dimensions": [
+    "minecraft:the_nether"
+  ],
+  "min_rarity": "apotheosis:uncommon",
+  "max_rarity": "apotheosis:epic",
+  "weight": 100,
+  "quality": 1,
+  "stack": {
+    "item": "kubejs:shovel",
+    "count": 1,
+    "nbt": {
+      "tic_materials": [
+        "tconstruct:iron",
+        "tconstruct:wood",
+        "tconstruct:iron"
+      ]
+    }
+  }
+}

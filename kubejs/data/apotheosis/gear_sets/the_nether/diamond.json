@@ -1,0 +1,100 @@
+{
+  "weight": 70,
+  "mainhands": [
+    {
+      "weight": 3,
+      "stack": {
+        "item": "tconstruct:sword",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:cobalt",
+            "tconstruct:wood",
+            "tconstruct:cobalt"
+          ]
+        }
+      }
+    },
+    {
+      "weight": 3,
+      "stack": {
+        "item": "tconstruct:hand_axe",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:cobalt",
+            "tconstruct:wood",
+            "tconstruct:cobalt"
+          ]
+        }
+      }
+    },
+    {
+      "weight": 2,
+      "stack": {
+        "item": "tconstruct:pickaxe",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:cobalt",
+            "tconstruct:wood",
+            "tconstruct:cobalt"
+          ]
+        }
+      }
+    },
+    {
+      "weight": 2,
+      "stack": {
+        "item": "kubejs:shovel",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:cobalt",
+            "tconstruct:wood",
+            "tconstruct:cobalt"
+          ]
+        }
+      }
+    }
+  ],
+  "offhands": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:shield"
+      }
+    }
+  ],
+  "boots": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:diamond_boots"
+      }
+    }
+  ],
+  "leggings": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:diamond_leggings"
+      }
+    }
+  ],
+  "chestplates": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:diamond_chestplate"
+      }
+    }
+  ],
+  "helmets": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:diamond_helmet"
+      }
+    }
+  ],
+  "tags": [
+    "the_nether"
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "weight": 100,
+  "mainhands": [
+    {
+      "weight": 3,
+      "stack": {
+        "item": "tconstruct:sword",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:iron",
+            "tconstruct:wood",
+            "tconstruct:iron"
+          ]
+        }
+      }
+    },
+    {
+      "weight": 3,
+      "stack": {
+        "item": "tconstruct:hand_axe",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:iron",
+            "tconstruct:wood",
+            "tconstruct:iron"
+          ]
+        }
+      }
+    },
+    {
+      "weight": 2,
+      "stack": {
+        "item": "tconstruct:pickaxe",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:iron",
+            "tconstruct:wood",
+            "tconstruct:iron"
+          ]
+        }
+      }
+    },
+    {
+      "weight": 2,
+      "stack": {
+        "item": "kubejs:shovel",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:iron",
+            "tconstruct:wood",
+            "tconstruct:iron"
+          ]
+        }
+      }
+    }
+  ],
+  "offhands": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:shield"
+      }
+    }
+  ],
+  "boots": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:iron_boots"
+      }
+    }
+  ],
+  "leggings": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:iron_leggings"
+      }
+    }
+  ],
+  "chestplates": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:iron_chestplate"
+      }
+    }
+  ],
+  "helmets": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:iron_helmet"
+      }
+    }
+  ],
+  "tags": [
+    "the_nether"
+  ]
+}

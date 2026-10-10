@@ -1,0 +1,93 @@
+{
+  "weight": 100,
+  "mainhands": [
+    {
+      "weight": 3,
+      "stack": {
+        "item": "tconstruct:sword",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:wood",
+            "tconstruct:wood",
+            "tconstruct:wood"
+          ]
+        }
+      }
+    },
+    {
+      "weight": 3,
+      "stack": {
+        "item": "tconstruct:hand_axe",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:wood",
+            "tconstruct:wood",
+            "tconstruct:wood"
+          ]
+        }
+      }
+    },
+    {
+      "weight": 2,
+      "stack": {
+        "item": "tconstruct:pickaxe",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:wood",
+            "tconstruct:wood",
+            "tconstruct:wood"
+          ]
+        }
+      }
+    },
+    {
+      "weight": 2,
+      "stack": {
+        "item": "kubejs:shovel",
+        "nbt": {
+          "tic_materials": [
+            "tconstruct:wood",
+            "tconstruct:wood",
+            "tconstruct:wood"
+          ]
+        }
+      }
+    }
+  ],
+  "offhands": [],
+  "boots": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:leather_boots"
+      }
+    }
+  ],
+  "leggings": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:leather_leggings"
+      }
+    }
+  ],
+  "chestplates": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:leather_chestplate"
+      }
+    }
+  ],
+  "helmets": [
+    {
+      "weight": 1,
+      "stack": {
+        "item": "minecraft:leather_helmet"
+      }
+    }
+  ],
+  "tags": [
+    "overworld"
+  ]
+}
